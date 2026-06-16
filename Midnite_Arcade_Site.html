@@ -172,6 +172,55 @@
 
   .reveal{opacity:0;transform:translateY(40px);transition:opacity .8s ease,transform .8s ease;}
   .reveal.in{opacity:1;transform:none;}
+
+  /* ── MODAL ── */
+  .modal-bg{position:fixed;inset:0;z-index:600;background:rgba(5,5,5,.7);backdrop-filter:blur(8px);
+    display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .3s;}
+  .modal-bg.open{opacity:1;pointer-events:auto;}
+  .modal{background:#141414;color:var(--cream);border:1px solid rgba(226,49,37,.35);border-radius:16px;
+    width:100%;max-width:780px;max-height:90vh;overflow:auto;position:relative;
+    box-shadow:0 40px 100px rgba(0,0,0,.7),0 0 40px rgba(226,49,37,.15);transform:translateY(24px) scale(.98);transition:transform .35s cubic-bezier(.2,.8,.25,1);}
+  .modal-bg.open .modal{transform:none;}
+  .modal .x{position:absolute;top:14px;right:16px;width:34px;height:34px;border-radius:50%;border:1px solid rgba(231,226,214,.3);
+    background:rgba(0,0,0,.4);color:var(--cream);cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;z-index:3;transition:background .2s,transform .2s;}
+  .modal .x:hover{background:var(--red);transform:rotate(90deg);}
+  .m-body{padding:30px;}
+  .m-rel{display:grid;grid-template-columns:230px 1fr;gap:28px;}
+  .m-rel .art{border-radius:10px;overflow:hidden;aspect-ratio:1;box-shadow:0 18px 40px rgba(0,0,0,.6),0 0 24px rgba(226,49,37,.2);}
+  .m-rel .art img,.m-rel .art svg{width:100%;height:100%;object-fit:cover;}
+  .m-cat{font-size:10px;letter-spacing:4px;color:var(--red);text-transform:uppercase;}
+  .m-title{font-family:'Anton',sans-serif;font-size:36px;text-transform:uppercase;line-height:.95;margin:8px 0 4px;}
+  .m-artist{font-size:13px;opacity:.7;margin-bottom:16px;}
+  .player{display:flex;align-items:center;gap:14px;background:#0d0d0d;border:1px solid rgba(226,49,37,.3);color:var(--cream);border-radius:10px;padding:14px 18px;margin-bottom:18px;}
+  .player .pp{width:42px;height:42px;border-radius:50%;border:none;background:var(--red);color:var(--cream);font-size:16px;cursor:pointer;flex-shrink:0;transition:transform .2s;box-shadow:0 0 16px rgba(226,49,37,.5);}
+  .player .pp:hover{transform:scale(1.08);}
+  .player .pinfo{flex:1;min-width:0;}
+  .player .pnow{font-size:11px;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .player .pbar{height:4px;background:rgba(231,226,214,.18);border-radius:3px;margin-top:8px;overflow:hidden;}
+  .player .pfill{height:100%;width:0;background:var(--red);border-radius:3px;}
+  .player.playing .pfill{animation:prog 30s linear forwards;}
+  @keyframes prog{from{width:0;}to{width:100%;}}
+  .eq{display:flex;gap:2px;align-items:flex-end;height:20px;width:22px;flex-shrink:0;}
+  .eq i{flex:1;background:var(--red);height:30%;border-radius:1px;}
+  .player.playing .eq i{animation:eqb .9s ease-in-out infinite;}
+  .player.playing .eq i:nth-child(2){animation-delay:.2s;} .player.playing .eq i:nth-child(3){animation-delay:.4s;} .player.playing .eq i:nth-child(4){animation-delay:.1s;}
+  @keyframes eqb{0%,100%{height:25%;}50%{height:95%;}}
+  .m-tracks{list-style:none;margin:0 0 20px;border-top:1px solid rgba(231,226,214,.14);}
+  .m-tracks li{display:flex;align-items:center;gap:12px;padding:11px 4px;border-bottom:1px solid rgba(231,226,214,.08);font-size:13px;cursor:pointer;transition:background .15s,padding-left .15s;}
+  .m-tracks li:hover{background:rgba(226,49,37,.08);padding-left:10px;}
+  .m-tracks li.active{color:var(--red);font-weight:700;}
+  .m-tracks li .tn{opacity:.45;min-width:26px;}
+  .m-tracks li .tt{flex:1;}
+  .m-tracks li .td{opacity:.5;font-size:12px;}
+  .m-links{display:flex;gap:10px;flex-wrap:wrap;}
+  .m-links a{font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:10px 16px;border-radius:24px;border:1.5px solid var(--cream);color:var(--cream);transition:background .2s,color .2s;}
+  .m-links a:hover{background:var(--cream);color:var(--ink);}
+  .m-links a.fill{background:var(--red);border-color:var(--red);color:var(--cream);}
+  .m-art{display:flex;gap:26px;align-items:flex-start;}
+  .m-art .av{width:140px;height:140px;border-radius:50%;overflow:hidden;flex-shrink:0;box-shadow:0 14px 30px rgba(0,0,0,.5);border:2px solid rgba(226,49,37,.4);}
+  .m-art .av svg{width:100%;height:100%;}
+  .m-art .bio{font-size:13px;line-height:1.75;opacity:.82;margin:14px 0 20px;}
+  @media(max-width:640px){.m-rel{grid-template-columns:1fr;}.m-art{flex-direction:column;align-items:center;text-align:center;}}
 </style>
 </head>
 <body>
@@ -269,6 +318,13 @@
     </form>
   </div>
 
+  <!-- MODAL -->
+  <div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+    <div class="modal"><button class="x" onclick="closeModal()">✕</button>
+      <div class="m-body" id="modalBody"></div>
+    </div>
+  </div>
+
   <footer>
     <div class="foot-in">
       <div>
@@ -332,20 +388,32 @@
   }
 
   const releases=[
-    {c:'MA04',t:'After Hours',a:'Glitch Theory',img:'Web Assets/F71C350D-4D97-45AA-9863-4DAC77F4FA7B.png'},
-    {c:'MA03',t:'Black Mode',a:'Null Sector',img:'Web Assets/76A476FA-853D-4653-AFE9-DEB32A90D8F2.png'},
-    {c:'MA02',t:'Warehouse',a:'Kira Volt'},
-    {c:'MA01',t:'Insert Coin EP',a:'The Operator',img:'Web Assets/ma_cover_square.png'},
-    {c:'MA00',t:'Past Midnite Vol.1',a:'Various'},
+    {c:'MA04',t:'After Hours',a:'Glitch Theory',img:'Web Assets/F71C350D-4D97-45AA-9863-4DAC77F4FA7B.png',year:'2026',fmt:'12" / Digital',
+      tracks:[['A1','Neon Static','6:12'],['A2','3AM Protocol','5:48'],['B1','Ghost Mode','7:02'],['B2','Last Train (Dub)','6:30']]},
+    {c:'MA03',t:'Black Mode',a:'Null Sector',img:'Web Assets/76A476FA-853D-4653-AFE9-DEB32A90D8F2.png',year:'2026',fmt:'Digital',
+      tracks:[['1','Black Mode','6:40'],['2','Null','7:15'],['3','Sector 7','6:58']]},
+    {c:'MA02',t:'Warehouse',a:'Kira Volt',year:'2025',fmt:'12" / Digital',
+      tracks:[['A1','Warehouse','7:20'],['A2','Voltage','6:05'],['B1','Strobe','8:12']]},
+    {c:'MA01',t:'Insert Coin EP',a:'The Operator',img:'Web Assets/ma_cover_square.png',year:'2025',fmt:'Digital',
+      tracks:[['1','Insert Coin','5:55'],['2','Continue?','6:40'],['3','Game Over (Dub)','7:18']]},
+    {c:'MA00',t:'Past Midnite Vol.1',a:'Various',year:'2024',fmt:'Compilation',
+      tracks:[['1','Glitch Theory — Static','6:02'],['2','Kira Volt — Surge','6:48'],['3','Null Sector — Void','7:10'],['4','Dead Pixel — Flicker','5:50']]},
   ];
-  document.getElementById('relGrid').innerHTML=releases.map(r=>`
-    <div class="rel"><div class="cover">${r.img?`<img src="${r.img}" onerror="this.outerHTML=cover('${r.c}')">`:cover(r.c+r.t)}<div class="play">▶</div></div>
+  document.getElementById('relGrid').innerHTML=releases.map((r,i)=>`
+    <div class="rel" onclick="openRelease(${i})"><div class="cover">${r.img?`<img src="${r.img}" onerror="this.outerHTML=cover('${r.c}')">`:cover(r.c+r.t)}<div class="play">▶</div></div>
       <div class="meta"><div class="c">${r.c}</div><div class="t">${r.t}</div><div class="a">${r.a}</div></div></div>`).join('');
 
-  const artists=['Glitch Theory','Null Sector','Kira Volt','The Operator','Dead Pixel','Neon Vandal'];
-  const roles=['Producer','Live','DJ / Producer','Producer','Live A/V','DJ'];
-  document.getElementById('artGrid').innerHTML=artists.map((n,i)=>`
-    <div class="artist-c"><div class="av">${cover(n)}</div><div class="n">${n}</div><div class="r">${roles[i]}</div></div>`).join('');
+  const artists=[
+    {n:'Glitch Theory',r:'Producer',bio:'Naarm electro producer trading in broken machines and warehouse pressure. After Hours set the tone for the Midnite Arcade sound — fast, dark, relentless.'},
+    {n:'Null Sector',r:'Live',bio:'Hardware-only live act building techno from a wall of modular and a single strobe. Never plays before 2AM.'},
+    {n:'Kira Volt',r:'DJ / Producer',bio:'High-voltage selector with a taste for acid, electro and the kind of records that clear the floor before they fill it.'},
+    {n:'The Operator',r:'Producer',bio:'Anonymous producer behind the Insert Coin EP. Identity unknown, BPM high. Believed to operate out of an old arcade in Footscray.'},
+    {n:'Dead Pixel',r:'Live A/V',bio:'Audio-visual artist pairing glitch techno with corrupted CRT visuals. The closest thing the label has to a house band.'},
+    {n:'Neon Vandal',r:'DJ',bio:'Graffiti-turned-graphics DJ who closes the night when the lights should already be on. Resident at Warehouse 9.'},
+  ];
+  const ALINKS=[['Instagram','#'],['SoundCloud','#'],['Spotify','#'],['Bookings','#']];
+  document.getElementById('artGrid').innerHTML=artists.map((a,i)=>`
+    <div class="artist-c" onclick="openArtist(${i})"><div class="av">${cover(a.n)}</div><div class="n">${a.n}</div><div class="r">${a.r}</div></div>`).join('');
 
   const tours=[
     {d:'20',m:'Jun',v:'Past Midnite · Warehouse 9',c:'Naarm / Melbourne',sold:true},
@@ -367,6 +435,56 @@
   document.getElementById('newsGrid').innerHTML=news.map(n=>`
     <div class="news-c"><div class="top"></div><div class="body">
       <div class="tagline">${n.tag}</div><h4>${n.t}</h4><p>${n.p}</p><div class="when">${n.w}</div></div></div>`).join('');
+
+  /* ── MODAL logic ── */
+  const STREAMS=[['Bandcamp','fill'],['Spotify',''],['SoundCloud',''],['Beatport','']];
+  const mb=document.getElementById('modalBg'), body=document.getElementById('modalBody');
+  function openModal(html){body.innerHTML=html;mb.classList.add('open');document.body.style.overflow='hidden';}
+  function closeModal(){mb.classList.remove('open');document.body.style.overflow='';}
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+  function openRelease(i){
+    const r=releases[i];
+    const art=r.img?`<img src="${r.img}" onerror="this.outerHTML=cover('${r.c}')">`:cover(r.c+r.t);
+    const tracks=r.tracks.map((t,j)=>`<li onclick="setTrack(${j})" data-j="${j}"><span class="tn">${t[0]}</span><span class="tt">${t[1]}</span><span class="td">${t[2]}</span></li>`).join('');
+    const links=STREAMS.map(s=>`<a class="${s[1]}" href="#">${s[0]}</a>`).join('')+`<a href="#">Buy Vinyl</a>`;
+    openModal(`<div class="m-rel">
+      <div class="art">${art}</div>
+      <div><div class="m-cat">${r.c} · ${r.fmt} · ${r.year}</div>
+        <div class="m-title">${r.t}</div><div class="m-artist">${r.a}</div>
+        <div class="player" id="player">
+          <button class="pp" onclick="togglePlay()" id="ppBtn">▶</button>
+          <div class="eq"><i></i><i></i><i></i><i></i></div>
+          <div class="pinfo"><div class="pnow" id="pNow">${r.tracks[0][1]}</div><div class="pbar"><div class="pfill"></div></div></div>
+        </div>
+        <ul class="m-tracks" id="mTracks">${tracks}</ul>
+        <div class="m-links">${links}</div>
+      </div></div>`);
+    setTrack(0);
+  }
+  function setTrack(j){
+    document.querySelectorAll('#mTracks li').forEach(li=>li.classList.toggle('active',+li.dataset.j===j));
+    const now=document.getElementById('pNow'); const li=document.querySelector(`#mTracks li[data-j="${j}"]`);
+    if(now&&li)now.textContent=li.querySelector('.tt').textContent;
+  }
+  function togglePlay(){
+    const p=document.getElementById('player'), btn=document.getElementById('ppBtn');
+    const on=p.classList.toggle('playing'); btn.textContent=on?'❚❚':'▶';
+    const fill=p.querySelector('.pfill'); fill.style.animation='none'; void fill.offsetWidth; if(on)fill.style.animation='';
+  }
+
+  function openArtist(i){
+    const a=artists[i];
+    const links=ALINKS.map((l,k)=>`<a class="${k===0?'fill':''}" href="${l[1]}">${l[0]}</a>`).join('');
+    const rel=releases.filter(r=>r.a===a.n);
+    const relLine=rel.length?`<div class="m-cat" style="margin-bottom:8px">On Midnite Arcade: ${rel.map(r=>r.c+' '+r.t).join(' · ')}</div>`:'';
+    openModal(`<div class="m-art">
+      <div class="av">${cover(a.n)}</div>
+      <div><div class="m-cat">${a.r}</div><div class="m-title">${a.n}</div>
+        ${relLine}<p class="bio">${a.bio}</p>
+        <div class="m-links">${links}</div>
+      </div></div>`);
+  }
 
   const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');}),{threshold:.12});
   document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
