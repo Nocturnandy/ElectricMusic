@@ -34,30 +34,18 @@
   nav .back:hover{opacity:1;border-color:var(--orange);color:var(--orange);}
   @media(max-width:760px){nav .links a:not(.back){display:none;}}
 
-  /* ── HERO: animated Bauhaus sun pattern ─────────────── */
-  .hero{position:relative;min-height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:104px 20px 72px;}
-  .pattern{position:absolute;inset:0;z-index:1;display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
-    grid-auto-rows:120px;}
-  .tile{position:relative;overflow:hidden;}
-  .tile svg{width:100%;height:100%;display:block;}
-  /* gentle life in the pattern */
-  @keyframes spin{to{transform:rotate(360deg);}}
-  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.12);}}
-  @keyframes rays{to{transform:rotate(-360deg);}}
-  .tile .rot{transform-origin:50% 50%;animation:spin 26s linear infinite;}
-  .tile .pul{transform-origin:50% 50%;animation:pulse 6s ease-in-out infinite;}
-  .tile .ray{transform-origin:50% 50%;animation:rays 40s linear infinite;}
-
-  .hero-scrim{position:absolute;inset:0;z-index:2;pointer-events:none;
-    background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(238,229,207,.86) 0%,rgba(238,229,207,.5) 45%,rgba(238,229,207,.15) 100%);}
+  /* ── HERO: 3D Sundara cube ──────────────────────────── */
+  .hero{position:relative;min-height:100vh;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:104px 20px 72px;
+    background:radial-gradient(ellipse 72% 62% at 50% 40%, #F4EDDD 0%, var(--cream) 72%);}
+  .cube-stage{position:relative;width:100%;max-width:560px;height:min(52vh,470px);}
+  .cube-stage canvas{width:100%;height:100%;display:block;cursor:grab;}
+  .cube-stage::after{content:'';position:absolute;left:50%;bottom:4%;transform:translateX(-50%);
+    width:46%;height:26px;background:radial-gradient(ellipse,rgba(39,90,129,.22),transparent 70%);filter:blur(4px);z-index:-1;}
   .hero-ui{position:relative;z-index:3;text-align:center;padding:0 24px;}
-  .hero-ui .sun{width:clamp(90px,12vw,140px);margin:0 auto 26px;animation:bob 5s ease-in-out infinite;}
-  @keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
-  .hero-ui .word{width:min(660px,90vw);margin:0 auto;filter:drop-shadow(0 10px 30px rgba(39,90,129,.28));}
-  .hero-ui .tag{margin-top:22px;font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,3vw,34px);letter-spacing:.22em;color:var(--navy);text-transform:uppercase;}
-  .hero-ui .sub{margin-top:12px;font-size:11px;letter-spacing:5px;text-transform:uppercase;opacity:.6;}
-  .hero-ui .cta{display:inline-block;margin-top:30px;padding:13px 30px;background:var(--orange);color:var(--cream);
+  .hero-ui .word{width:min(440px,72vw);margin:0 auto;filter:drop-shadow(0 10px 26px rgba(39,90,129,.22));}
+  .hero-ui .tag{margin-top:16px;font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,3vw,32px);letter-spacing:.22em;color:var(--navy);text-transform:uppercase;}
+  .hero-ui .sub{margin-top:10px;font-size:11px;letter-spacing:5px;text-transform:uppercase;opacity:.6;}
+  .hero-ui .cta{display:inline-block;margin-top:22px;padding:13px 30px;background:var(--orange);color:var(--cream);
     font-size:11px;letter-spacing:4px;text-transform:uppercase;border-radius:30px;transition:transform .25s,background .25s;}
   .hero-ui .cta:hover{transform:translateY(-3px);background:var(--navy);}
   .scroll-cue{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);z-index:3;font-size:9px;letter-spacing:4px;text-transform:uppercase;opacity:.5;animation:cue 2.2s infinite;}
@@ -233,11 +221,10 @@
   </nav>
 
   <header class="hero" id="top">
-    <div class="pattern" id="pattern"></div>
-    <div class="hero-scrim"></div>
+    <div class="cube-stage"><canvas id="cubeCanvas"></canvas></div>
     <div class="hero-ui">
       <img class="word" src="Web Assets/sundara_logo_transparent.png" alt="SUNDARA"
-           onerror="this.outerHTML='&lt;h1 style=\'font-family:Anton;font-size:clamp(56px,12vw,150px);color:var(--orange);letter-spacing:2px\'&gt;SUNDARA&lt;/h1&gt;'">
+           onerror="this.outerHTML='&lt;h1 style=\'font-family:Anton;font-size:clamp(48px,11vw,120px);color:var(--orange);letter-spacing:2px\'&gt;SUNDARA&lt;/h1&gt;'">
       <p class="tag">Stay For Sunrise</p>
       <p class="sub">Naarm / Melbourne · Est. 2024</p>
       <a href="#releases" class="cta">Hear the latest →</a>
@@ -372,21 +359,6 @@
     {bg:ORANGE, a:NAVY, b:CREAM},
     {bg:CREAMD, a:NAVY, b:ORANGE},
   ];
-  (function buildPattern(){
-    const wrap=document.getElementById('pattern');
-    const cols=Math.ceil(window.innerWidth/120);
-    const rows=Math.ceil(window.innerHeight/120);
-    const n=cols*rows+cols;
-    let html='';
-    for(let i=0;i<n;i++){
-      const p=palettes[Math.floor(Math.random()*palettes.length)];
-      const s=shapes[Math.floor(Math.random()*shapes.length)];
-      const rot=[0,90,180,270][Math.floor(Math.random()*4)];
-      html+=`<div class="tile" style="background:${p.bg};transform:rotate(${rot}deg)">${s(p)}</div>`;
-    }
-    wrap.innerHTML=html;
-  })();
-
   /* ── Geometric cover generator (Bauhaus) for placeholder releases ── */
   function cover(seed){
     const ps=palettes; let h=0; for(const ch of seed) h=(h*31+ch.charCodeAt(0))&0xffff;
@@ -507,6 +479,102 @@
 
   const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');}),{threshold:.12});
   document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+
+<!-- ── 3D Sundara cube hero ── -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  if(!window.THREE){return;}
+  const CR='#EEE5CF', OR='#FC7218', NV='#275A81', DK='#1d1916', SAND='#E4D2A6';
+  const SZ=256, R=SZ/2;
+  function mk(fn){const cv=document.createElement('canvas');cv.width=cv.height=SZ;fn(cv.getContext('2d'));const t=new THREE.CanvasTexture(cv);t.anisotropy=8;return t;}
+  function bd(c){c.strokeStyle='rgba(20,15,5,.08)';c.lineWidth=SZ*0.045;c.strokeRect(0,0,SZ,SZ);}
+  function bg(c,col){c.fillStyle=col;c.fillRect(0,0,SZ,SZ);}
+
+  /* ── bauhaus sun tiles for the four side faces ── */
+  const pats=[
+    c=>{bg(c,SAND);c.fillStyle=OR;c.beginPath();c.arc(R,R,SZ*0.33,0,7);c.fill();bd(c);},                                  /* sun disc */
+    c=>{bg(c,NV);c.strokeStyle=OR;c.lineWidth=SZ*0.02;c.lineCap='round';for(let i=0;i<16;i++){const a=i/16*7;c.beginPath();c.moveTo(R,R);c.lineTo(R+Math.cos(a)*SZ*0.46,R+Math.sin(a)*SZ*0.46);c.stroke();}c.fillStyle=OR;c.beginPath();c.arc(R,R,SZ*0.2,0,7);c.fill();bd(c);}, /* night sun */
+    c=>{bg(c,SAND);c.fillStyle=NV;c.fillRect(0,SZ*0.62,SZ,SZ);c.fillStyle=OR;c.beginPath();c.arc(R,SZ*0.62,SZ*0.3,Math.PI,0);c.fill();bd(c);}, /* sun on horizon */
+    c=>{bg(c,OR);c.strokeStyle=SAND;c.lineWidth=SZ*0.05;c.beginPath();c.arc(R,R,SZ*0.21,0,7);c.stroke();c.beginPath();c.arc(R,R,SZ*0.37,0,7);c.stroke();bd(c);}, /* sun rings */
+    c=>{bg(c,NV);c.fillStyle=OR;c.beginPath();c.arc(R,R,SZ*0.17,0,7);c.fill();bd(c);},                                    /* navy + dot */
+    c=>{bg(c,OR);c.fillStyle=NV;c.beginPath();c.arc(R,R,SZ*0.15,0,7);c.fill();bd(c);},                                    /* orange + dot */
+    c=>{bg(c,SAND);c.strokeStyle=OR;c.lineWidth=SZ*0.018;c.lineCap='round';for(let i=0;i<16;i++){const a=i/16*7;c.beginPath();c.moveTo(R,R);c.lineTo(R+Math.cos(a)*SZ*0.45,R+Math.sin(a)*SZ*0.45);c.stroke();}c.fillStyle=OR;c.beginPath();c.arc(R,R,SZ*0.09,0,7);c.fill();bd(c);}, /* sunburst */
+  ].map(mk);
+  const dark=mk(c=>{bg(c,DK);});
+  const pickPat=()=>pats[Math.floor(Math.random()*pats.length)];
+
+  /* ── full-face pictures, sliced 3×3 across the cubelets ── */
+  const FULL=384;
+  function fullTex(fn){const cv=document.createElement('canvas');cv.width=cv.height=FULL;fn(cv.getContext('2d'),FULL);const t=new THREE.CanvasTexture(cv);t.anisotropy=8;return t;}
+  function drawSun(c,F){c.fillStyle=SAND;c.fillRect(0,0,F,F);const cx=F/2,cy=F/2;c.strokeStyle=OR;c.lineWidth=F*0.02;c.lineCap='round';for(let i=0;i<20;i++){const a=i/20*Math.PI*2;c.beginPath();c.moveTo(cx+Math.cos(a)*F*0.31,cy+Math.sin(a)*F*0.31);c.lineTo(cx+Math.cos(a)*F*0.46,cy+Math.sin(a)*F*0.46);c.stroke();}c.fillStyle=OR;c.beginPath();c.arc(cx,cy,F*0.26,0,7);c.fill();c.strokeStyle=SAND;c.lineWidth=F*0.028;c.beginPath();c.arc(cx,cy,F*0.17,0,7);c.stroke();}
+  function drawPalm(c,F){c.fillStyle=SAND;c.fillRect(0,0,F,F);c.fillStyle=NV;c.fillRect(0,F*0.88,F,F*0.12);const cx=F*0.5,cy=F*0.42;c.lineCap='round';c.strokeStyle=NV;c.lineWidth=F*0.055;c.beginPath();c.moveTo(F*0.5,F*0.9);c.quadraticCurveTo(F*0.45,F*0.62,cx,cy);c.stroke();c.strokeStyle=OR;c.lineWidth=F*0.045;const fr=(deg,len)=>{const a=deg*Math.PI/180,ex=cx+Math.cos(a)*F*len,ey=cy+Math.sin(a)*F*len,bx=cx+Math.cos(a)*F*len*0.5,by=cy+Math.sin(a)*F*len*0.5-F*0.05;c.beginPath();c.moveTo(cx,cy);c.quadraticCurveTo(bx,by,ex,ey);c.stroke();};[[-90,.30],[-58,.30],[-122,.30],[-30,.26],[-150,.26],[-10,.20],[-170,.20]].forEach(f=>fr(f[0],f[1]));c.fillStyle=OR;[-0.045,0.045].forEach(dx=>{c.beginPath();c.arc(cx+F*dx,cy+F*0.05,F*0.024,0,7);c.fill();});}
+  const sunFull=fullTex(drawSun), palmFull=fullTex(drawPalm);
+  function slice(full,col,row){const t=full.clone();t.repeat.set(1/3,1/3);t.offset.set(col/3,row/3);t.anisotropy=8;t.needsUpdate=true;return t;}
+
+  const stage=document.querySelector('.cube-stage'), canvas=document.getElementById('cubeCanvas');
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setClearColor(0x000000,0);
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(38,1,0.1,100);
+  camera.position.set(6.4,4.9,8.4);camera.lookAt(0,0,0);
+  scene.add(new THREE.HemisphereLight(0xfff6e6,0x9c8f73,0.95));
+  const dir=new THREE.DirectionalLight(0xffffff,0.6);dir.position.set(5,9,7);scene.add(dir);
+  scene.add(new THREE.AmbientLight(0xffffff,0.35));
+
+  function size(){const w=stage.clientWidth||400,h=stage.clientHeight||400;renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+  size();window.addEventListener('resize',size);
+
+  const root=new THREE.Group();scene.add(root);
+  const STEP=0.96, cubelets=[];
+  const mat=t=>new THREE.MeshStandardMaterial({map:t,roughness:0.72,metalness:0});
+  for(let ix=0;ix<3;ix++)for(let iy=0;iy<3;iy++)for(let iz=0;iz<3;iz++){
+    const mats=[
+      mat(ix===2?slice(palmFull,iz,iy):dark),   /* +x : PALM TREE */
+      mat(ix===0?pickPat():dark),               /* -x */
+      mat(iy===2?pickPat():dark),               /* +y */
+      mat(iy===0?pickPat():dark),               /* -y */
+      mat(iz===2?slice(sunFull,ix,iy):dark),    /* +z : SUN */
+      mat(iz===0?pickPat():dark),               /* -z */
+    ];
+    const m=new THREE.Mesh(new THREE.BoxGeometry(0.9,0.9,0.9),mats);
+    m.position.set((ix-1)*STEP,(iy-1)*STEP,(iz-1)*STEP);root.add(m);cubelets.push(m);
+  }
+
+  /* ── move engine: scramble, then solve back to reveal the picture ── */
+  let pivot=null,pM=[],pAx='',pAng=0,pPr=0;const ADUR=0.5;
+  const ease=t=>t<0.5?2*t*t:-1+(4-2*t)*t, snap=v=>Math.round(v/STEP)*STEP;
+  const layer=(ax,idx)=>{const tg=(idx-1)*STEP;return cubelets.filter(m=>Math.abs((ax==='x'?m.position.x:ax==='y'?m.position.y:m.position.z)-tg)<0.3);};
+  function beginMove(ax,idx,dir){pAx=ax;pAng=dir*Math.PI/2;pPr=0;pM=layer(ax,idx);pivot=new THREE.Group();root.add(pivot);pM.forEach(m=>{root.remove(m);pivot.add(m);});}
+  function end(){const v=pAx==='x'?new THREE.Vector3(1,0,0):pAx==='y'?new THREE.Vector3(0,1,0):new THREE.Vector3(0,0,1);const q=new THREE.Quaternion().setFromAxisAngle(v,pAng);pM.forEach(m=>{pivot.remove(m);m.position.applyQuaternion(q);m.position.x=snap(m.position.x);m.position.y=snap(m.position.y);m.position.z=snap(m.position.z);m.quaternion.premultiply(q);root.add(m);});root.remove(pivot);pivot=null;}
+  const setA=a=>{if(pAx==='x')pivot.rotation.x=a;else if(pAx==='y')pivot.rotation.y=a;else pivot.rotation.z=a;};
+
+  let queue=[], history=[], state='holdSolved', pause=2.6;
+  const AX=['x','y','z'];
+  function scramble(){history=[];for(let i=0;i<14;i++){const a=AX[Math.floor(Math.random()*3)],idx=Math.floor(Math.random()*3),dir=Math.random()<0.5?1:-1;queue.push([a,idx,dir]);history.push([a,idx,dir]);}}
+  function solveBack(){for(let i=history.length-1;i>=0;i--)queue.push([history[i][0],history[i][1],-history[i][2]]);}
+
+  /* mouse parallax */
+  let mx=0,my=0,tx=0,ty=0;
+  stage.addEventListener('pointermove',e=>{const r=stage.getBoundingClientRect();tx=(e.clientX-r.left)/r.width-0.5;ty=(e.clientY-r.top)/r.height-0.5;});
+  stage.addEventListener('pointerleave',()=>{tx=0;ty=0;});
+
+  const clock=new THREE.Clock();
+  (function loop(){requestAnimationFrame(loop);const dt=Math.min(clock.getDelta(),0.05),t=clock.getElapsedTime();
+    root.rotation.y+=0.0030;root.rotation.x+=0.0012;root.position.y=Math.sin(t*0.7)*0.16;
+    mx+=(tx-mx)*0.05;my+=(ty-my)*0.05;
+    camera.position.x=6.4+mx*2.6;camera.position.y=4.9-my*2.2;camera.lookAt(0,0,0);
+    if(pivot){pPr=Math.min(pPr+dt/ADUR,1);setA(pAng*ease(pPr));if(pPr>=1)end();}
+    else if(queue.length){const mv=queue.shift();beginMove(mv[0],mv[1],mv[2]);}
+    else if(pause>0){pause-=dt;}
+    else if(state==='holdSolved'){scramble();state='scrambling';}
+    else if(state==='scrambling'){state='preSolve';pause=0.5;}
+    else if(state==='preSolve'){solveBack();state='solving';}
+    else{state='holdSolved';pause=3.4;}
+    renderer.render(scene,camera);
+  })();
+})();
 </script>
 </body>
 </html>

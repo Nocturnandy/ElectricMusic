@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SUNDARA — Bauhaus Sun Background (Option)</title>
+<!--
+  REUSABLE BACKGROUND OPTION · "Bauhaus Sun Pattern"
+  Animated geometric sun/quarter-circle grid in Sundara cream/navy/orange.
+  Drop the <header class="hero"> block + the .hero/.pattern/.tile CSS + the
+  shapes/palettes/buildPattern script into any page to reuse this background.
+-->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=Anton&display=swap');
+  :root{ --cream:#EEE5CF; --ink:#16130F; --navy:#275A81; --orange:#FC7218; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--cream);color:var(--ink);font-family:'Space Mono',monospace;overflow-x:hidden;}
+
+  /* film grain */
+  body::after{content:'';position:fixed;inset:0;z-index:999;pointer-events:none;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+  .hero{position:relative;min-height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:80px 20px;}
+  .pattern{position:absolute;inset:0;z-index:1;display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(120px,1fr));grid-auto-rows:120px;}
+  .tile{position:relative;overflow:hidden;}
+  .tile svg{width:100%;height:100%;display:block;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.12);}}
+  @keyframes rays{to{transform:rotate(-360deg);}}
+  .tile .rot{transform-origin:50% 50%;animation:spin 26s linear infinite;}
+  .tile .pul{transform-origin:50% 50%;animation:pulse 6s ease-in-out infinite;}
+  .tile .ray{transform-origin:50% 50%;animation:rays 40s linear infinite;}
+
+  .hero-scrim{position:absolute;inset:0;z-index:2;pointer-events:none;
+    background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(238,229,207,.86) 0%,rgba(238,229,207,.5) 45%,rgba(238,229,207,.15) 100%);}
+  .hero-ui{position:relative;z-index:3;text-align:center;padding:0 24px;}
+  .hero-ui .word{width:min(660px,90vw);margin:0 auto;filter:drop-shadow(0 10px 30px rgba(39,90,129,.28));}
+  .hero-ui h1{font-family:'Anton',sans-serif;font-size:clamp(56px,12vw,150px);color:var(--orange);letter-spacing:2px;}
+  .hero-ui .tag{margin-top:18px;font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,3vw,34px);letter-spacing:.22em;color:var(--navy);text-transform:uppercase;}
+  .hero-ui .sub{margin-top:12px;font-size:11px;letter-spacing:5px;text-transform:uppercase;opacity:.6;}
+  .hero-ui .cta{display:inline-block;margin-top:30px;padding:13px 30px;background:var(--orange);color:var(--cream);
+    font-size:11px;letter-spacing:4px;text-transform:uppercase;border-radius:30px;transition:transform .25s,background .25s;}
+  .hero-ui .cta:hover{transform:translateY(-3px);background:var(--navy);}
+  .scroll-cue{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);z-index:3;font-size:9px;letter-spacing:4px;text-transform:uppercase;opacity:.5;animation:cue 2.2s infinite;}
+  @keyframes cue{0%,100%{opacity:.5;}50%{opacity:.12;}}
+</style>
+</head>
+<body>
+  <header class="hero">
+    <div class="pattern" id="pattern"></div>
+    <div class="hero-scrim"></div>
+    <div class="hero-ui">
+      <img class="word" src="Web Assets/sundara_logo_transparent.png" alt="SUNDARA"
+           onerror="this.outerHTML='&lt;h1&gt;SUNDARA&lt;/h1&gt;'">
+      <p class="tag">Stay For Sunrise</p>
+      <p class="sub">Naarm / Melbourne · Est. 2024</p>
+      <a href="#" class="cta">Hear the latest →</a>
+    </div>
+    <span class="scroll-cue">Scroll ↓</span>
+  </header>
+
+<script>
+  const NAVY='#275A81', ORANGE='#FC7218', CREAM='#EEE5CF', CREAMD='#E6D9BC';
+  const shapes = [
+    c => `<svg viewBox="0 0 100 100"><g class="rot"><path d="M0 100 A100 100 0 0 1 100 0 L100 100 Z" fill="${c.a}"/></g></svg>`,
+    c => `<svg viewBox="0 0 100 100"><circle class="pul" cx="50" cy="50" r="34" fill="${c.a}"/></svg>`,
+    c => `<svg viewBox="0 0 100 100"><path d="M0 50 A50 50 0 0 1 100 50 Z" fill="${c.a}"/></svg>`,
+    c => `<svg viewBox="0 0 100 100"><path d="M0 0 A100 100 0 0 1 100 100 L0 100 Z" fill="${c.a}"/><circle cx="50" cy="50" r="16" fill="${c.b}"/></svg>`,
+    c => {let r='';for(let i=0;i<12;i++){const a=i*30*Math.PI/180;r+=`<line x1="50" y1="50" x2="${50+46*Math.cos(a)}" y2="${50+46*Math.sin(a)}" stroke="${c.a}" stroke-width="5"/>`;}return `<svg viewBox="0 0 100 100"><g class="ray">${r}</g><circle cx="50" cy="50" r="12" fill="${c.b}"/></svg>`;},
+    c => `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="${c.a}" stroke-width="6"/><circle class="pul" cx="50" cy="50" r="20" fill="${c.b}"/></svg>`,
+    c => `<svg viewBox="0 0 100 100"><path d="M0 0 H100 V100 Z" fill="${c.a}"/></svg>`,
+  ];
+  const palettes = [
+    {bg:CREAM, a:NAVY, b:ORANGE},
+    {bg:CREAM, a:ORANGE, b:NAVY},
+    {bg:NAVY, a:ORANGE, b:CREAM},
+    {bg:ORANGE, a:NAVY, b:CREAM},
+    {bg:CREAMD, a:NAVY, b:ORANGE},
+  ];
+  (function buildPattern(){
+    const wrap=document.getElementById('pattern');
+    const cols=Math.ceil(window.innerWidth/120);
+    const rows=Math.ceil(window.innerHeight/120);
+    const n=cols*rows+cols;
+    let html='';
+    for(let i=0;i<n;i++){
+      const p=palettes[Math.floor(Math.random()*palettes.length)];
+      const s=shapes[Math.floor(Math.random()*shapes.length)];
+      const rot=[0,90,180,270][Math.floor(Math.random()*4)];
+      html+=`<div class="tile" style="background:${p.bg};transform:rotate(${rot}deg)">${s(p)}</div>`;
+    }
+    wrap.innerHTML=html;
+  })();
+</script>
+</body>
+</html>
