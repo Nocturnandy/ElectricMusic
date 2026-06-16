@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SUNDARA</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f0ebe0; overflow:hidden; }
+canvas { display:block; }
+.overlay {
+  position:fixed; bottom:8%; width:100%;
+  text-align:center; pointer-events:none;
+}
+.title {
+  font-family:'Arial Black',Arial,sans-serif;
+  font-weight:900;
+  font-size:clamp(1.8rem,5vw,4rem);
+  letter-spacing:0.45em;
+  color:#2a2a2a;
+  text-transform:uppercase;
+}
+.sub {
+  font-family:Arial,sans-serif;
+  font-size:clamp(0.55rem,1.5vw,0.9rem);
+  letter-spacing:0.35em;
+  color:#e06030;
+  text-transform:uppercase;
+  margin-top:0.5em;
+}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="overlay">
+  <div class="title">SUNDARA</div>
+  <div class="sub">Stay for Sunrise</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ── Brand palette ──────────────────────────────────────────────────────────
+const CR='#f0ebe0', OR='#e06030', BL='#6b8ba4', DK='#2a2a2a';
+const SZ=128;
+
+// ── Canvas texture helper ──────────────────────────────────────────────────
+function mkTex(fn){
+  const cv=document.createElement('canvas');
+  cv.width=cv.height=SZ;
+  fn(cv.getContext('2d'));
+  return new THREE.CanvasTexture(cv);
+}
+
+// ── 10 geometric pattern tiles ─────────────────────────────────────────────
+const pats=[
+  // 1. Full circle – orange on cream
+  c=>{c.fillStyle=CR;c.fillRect(0,0,SZ,SZ);c.fillStyle=OR;c.beginPath();c.arc(SZ/2,SZ/2,50,0,Math.PI*2);c.fill();},
+  // 2. Ring – orange outline
+  c=>{c.fillStyle=CR;c.fillRect(0,0,SZ,SZ);c.strokeStyle=OR;c.lineWidth=12;c.beginPath();c.arc(SZ/2,SZ/2,44,0,Math.PI*2);c.stroke();},
+  // 3. Semicircle – blue bottom half
+  c=>{c.fillStyle=CR;c.fillRect(0,0,SZ,SZ);c.fillStyle=BL;c.beginPath();c.arc(SZ/2,SZ/2,54,0,Math.PI);c.closePath();c.fill();},
+  // 4. Quarter circle – orange corner
+  c=>{c.fillStyle=CR;c.fillRect(0,0,SZ,SZ);c.fillStyle=OR;c.beginPath();c.moveTo(0,0);c.arc(0,0,SZ,0,Math.PI/2);c.closePath();c.fill();},
+  // 5. Starburst – 16 orange rays
+  c=>{c.fillStyle=CR;c.fillRect(0,0,SZ,SZ);c.strokeStyle=OR;c.lineWidth=2.5;for(let i=0;i<16;i++){const a=i/16*Math.PI*2;c.beginPath();c.moveTo(SZ/2,SZ/2);c.lineTo(SZ/2+Math.cos(a)*56,SZ/2+Math.sin(a)*56);c.stroke();}},
+  // 6. Concentric rings – two blue outlines
+  c=>{c.fillStyle=CR;c.fillRect(0,0,SZ,SZ);c.strokeStyle=BL;c.lineWidth=6;c.beginPath();c.arc(SZ/2,SZ/2,30,0,Math.PI*2);c.stroke();c.beginPath();c.arc(SZ/2,SZ/2,52,0,Math.PI*2);c.stroke();},
+  // 7. Solid orange block
+  c=>{c.fillStyle=OR;c.fillRect(0,0,SZ,SZ);},
+  // 8. Solid blue block
+  c=>{c.fillStyle=BL;c.fillRect(0,0,SZ,SZ);},
+  // 9. Cross/plus – orange on cream
+  c=>{c.fillStyle=CR;c.fillRect(0,0,SZ,SZ);c.fillStyle=OR;c.fillRect(SZ/2-10,12,20,SZ-24);c.fillRect(12,SZ/2-10,SZ-24,20);},
+  // 10. Circle-in-square – blue circle, orange border
+  c=>{c.fillStyle=CR;c.fillRect(0,0,SZ,SZ);c.strokeStyle=OR;c.lineWidth=10;c.strokeRect(12,12,SZ-24,SZ-24);c.fillStyle=BL;c.beginPath();c.arc(SZ/2,SZ/2,36,0,Math.PI*2);c.fill();}
+].map(fn=>mkTex(fn));
+
+const darkTex=mkTex(c=>{c.fillStyle=DK;c.fillRect(0,0,SZ,SZ);});
+const rndPat=()=>pats[Math.floor(Math.random()*pats.length)];
+
+// ── Renderer / scene / camera ──────────────────────────────────────────────
+const canvas=document.getElementById('c');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+renderer.setClearColor(0xf0ebe0);
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(40,1,0.1,100);
+camera.position.set(6,4.5,8);
+camera.lookAt(0,0,0);
+
+function resize(){
+  const w=window.innerWidth,h=window.innerHeight;
+  renderer.setSize(w,h);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  camera.aspect=w/h;
+  camera.updateProjectionMatrix();
+}
+resize();
+window.addEventListener('resize',resize);
+
+// ── Build 3×3×3 cubelet array ──────────────────────────────────────────────
+const root=new THREE.Group();
+scene.add(root);
+const STEP=0.95;   // cubelet size 0.9 + gap 0.05
+const cubelets=[];
+
+for(let ix=0;ix<3;ix++)
+  for(let iy=0;iy<3;iy++)
+    for(let iz=0;iz<3;iz++){
+      // MeshBasicMaterial array: [+x, -x, +y, -y, +z, -z]
+      const mats=[
+        new THREE.MeshBasicMaterial({map:ix===2?rndPat():darkTex}),
+        new THREE.MeshBasicMaterial({map:ix===0?rndPat():darkTex}),
+        new THREE.MeshBasicMaterial({map:iy===2?rndPat():darkTex}),
+        new THREE.MeshBasicMaterial({map:iy===0?rndPat():darkTex}),
+        new THREE.MeshBasicMaterial({map:iz===2?rndPat():darkTex}),
+        new THREE.MeshBasicMaterial({map:iz===0?rndPat():darkTex}),
+      ];
+      const mesh=new THREE.Mesh(new THREE.BoxGeometry(0.9,0.9,0.9),mats);
+      mesh.position.set((ix-1)*STEP,(iy-1)*STEP,(iz-1)*STEP);
+      root.add(mesh);
+      cubelets.push(mesh);
+    }
+
+// ── Layer-rotation state ───────────────────────────────────────────────────
+let pivot=null, pivotMeshes=[], pivotAxis='', pivotAngle=0, pivotProg=0;
+const ADUR=0.6;  // animation duration in seconds
+
+const ease=t=>t<0.5?2*t*t:-1+(4-2*t)*t;
+const snap=v=>Math.round(v/STEP)*STEP;  // snap to grid after rotation
+
+function layerMeshes(axis,idx){
+  const target=(idx-1)*STEP;
+  return cubelets.filter(m=>{
+    const p=axis==='x'?m.position.x:axis==='y'?m.position.y:m.position.z;
+    return Math.abs(p-target)<0.25;
+  });
+}
+
+function startLayer(){
+  const axes=['x','y','z'];
+  pivotAxis=axes[Math.floor(Math.random()*3)];
+  const idx=Math.floor(Math.random()*3);
+  pivotAngle=(Math.random()<0.5?1:-1)*Math.PI/2;
+  pivotProg=0;
+  pivotMeshes=layerMeshes(pivotAxis,idx);
+  pivot=new THREE.Group();
+  root.add(pivot);
+  pivotMeshes.forEach(m=>{root.remove(m);pivot.add(m);});
+}
+
+function endLayer(){
+  // Exact quaternion for this rotation
+  const axVec=pivotAxis==='x'?new THREE.Vector3(1,0,0)
+             :pivotAxis==='y'?new THREE.Vector3(0,1,0)
+             :new THREE.Vector3(0,0,1);
+  const q=new THREE.Quaternion().setFromAxisAngle(axVec,pivotAngle);
+
+  pivotMeshes.forEach(m=>{
+    pivot.remove(m);
+    m.position.applyQuaternion(q);
+    // Snap to prevent float drift over many rotations
+    m.position.x=snap(m.position.x);
+    m.position.y=snap(m.position.y);
+    m.position.z=snap(m.position.z);
+    m.quaternion.premultiply(q);
+    root.add(m);
+  });
+  root.remove(pivot);
+  pivot=null;
+}
+
+function setPivotAngle(a){
+  if(pivotAxis==='x') pivot.rotation.x=a;
+  else if(pivotAxis==='y') pivot.rotation.y=a;
+  else pivot.rotation.z=a;
+}
+
+// ── Main loop ──────────────────────────────────────────────────────────────
+const clock=new THREE.Clock();
+let nextShuffle=3;  // first shuffle at 3 s
+
+(function animate(){
+  requestAnimationFrame(animate);
+  const dt=clock.getDelta();
+  const t=clock.getElapsedTime();
+
+  // Gentle constant rotation of whole cube
+  root.rotation.x+=0.003;
+  root.rotation.y+=0.0025;
+
+  // Trigger a new layer shuffle every 3 s
+  if(!pivot && t>=nextShuffle){
+    nextShuffle=t+3;
+    startLayer();
+  }
+
+  // Drive layer animation
+  if(pivot){
+    pivotProg=Math.min(pivotProg+dt/ADUR,1);
+    setPivotAngle(pivotAngle*ease(pivotProg));
+    if(pivotProg>=1) endLayer();
+  }
+
+  renderer.render(scene,camera);
+})();
+</script>
+</body>
+</html>

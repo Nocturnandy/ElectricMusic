@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1700 480" width="1700" height="480" font-family="Helvetica,Arial,sans-serif">
+<rect width="1700" height="480" fill="#E7E2D6"/>
+<text x="60" y="46" font-size="26" font-weight="700" letter-spacing="3" fill="#0D0D0D">MIDNITE ARCADE — COLOUR PALETTE</text>
+<rect x="60" y="74" width="240" height="240" rx="10" fill="#0D0D0D" stroke="#0D0D0D" stroke-width="2"/>
+<text x="60" y="350" font-size="30" font-weight="700" fill="#0D0D0D">Black</text>
+<text x="60" y="384" font-size="24" font-family="monospace" fill="#0D0D0D">#0D0D0D</text>
+<text x="60" y="416" font-size="20" fill="#555">Ink / base</text>
+<rect x="328" y="74" width="240" height="240" rx="10" fill="#E7E2D6" stroke="#0D0D0D" stroke-width="2"/>
+<text x="328" y="350" font-size="30" font-weight="700" fill="#0D0D0D">Cream</text>
+<text x="328" y="384" font-size="24" font-family="monospace" fill="#0D0D0D">#E7E2D6</text>
+<text x="328" y="416" font-size="20" fill="#555">Stock / type</text>
+<rect x="596" y="74" width="240" height="240" rx="10" fill="#E23125" stroke="#0D0D0D" stroke-width="2"/>
+<text x="596" y="350" font-size="30" font-weight="700" fill="#0D0D0D">Red</text>
+<text x="596" y="384" font-size="24" font-family="monospace" fill="#0D0D0D">#E23125</text>
+<text x="596" y="416" font-size="20" fill="#555">Signal</text>
+<rect x="864" y="74" width="240" height="240" rx="10" fill="#34923D" stroke="#0D0D0D" stroke-width="2"/>
+<text x="864" y="350" font-size="30" font-weight="700" fill="#0D0D0D">Green</text>
+<text x="864" y="384" font-size="24" font-family="monospace" fill="#0D0D0D">#34923D</text>
+<text x="864" y="416" font-size="20" fill="#555">Label MA</text>
+<rect x="1132" y="74" width="240" height="240" rx="10" fill="#1C5486" stroke="#0D0D0D" stroke-width="2"/>
+<text x="1132" y="350" font-size="30" font-weight="700" fill="#0D0D0D">Blue</text>
+<text x="1132" y="384" font-size="24" font-family="monospace" fill="#0D0D0D">#1C5486</text>
+<text x="1132" y="416" font-size="20" fill="#555">Label MA</text>
+<rect x="1400" y="74" width="240" height="240" rx="10" fill="#E9A81C" stroke="#0D0D0D" stroke-width="2"/>
+<text x="1400" y="350" font-size="30" font-weight="700" fill="#0D0D0D">Gold</text>
+<text x="1400" y="384" font-size="24" font-family="monospace" fill="#0D0D0D">#E9A81C</text>
+<text x="1400" y="416" font-size="20" fill="#555">Bolt / smiley</text>
+</svg>
