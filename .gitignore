@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+
+# Large source / working files (not needed to run the site)
+*.ai
+
+# Temp / backup working copies
+*_backup.html
+~$*
+*.tmp

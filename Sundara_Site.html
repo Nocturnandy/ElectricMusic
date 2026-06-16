@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SUNDARA ☀ Stay For Sunrise</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=Anton&display=swap');
+  :root{
+    --cream:#EEE5CF; --cream-deep:#E6D9BC; --ink:#16130F;
+    --navy:#275A81; --orange:#FC7218; --orange-soft:#FF8A3D;
+    --elec-red:#A22021;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--cream);color:var(--ink);font-family:'Space Mono',monospace;overflow-x:hidden;}
+  ::selection{background:var(--orange);color:var(--cream);}
+  a{color:inherit;text-decoration:none;}
+  img{display:block;max-width:100%;}
+
+  /* film grain */
+  body::after{content:'';position:fixed;inset:0;z-index:999;pointer-events:none;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+  /* ── NAV ─────────────────────────────────────────────── */
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;
+    padding:16px 30px;background:rgba(238,229,207,.82);backdrop-filter:blur(10px);
+    border-bottom:1px solid rgba(39,90,129,.18);}
+  nav .brand{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:1px;color:var(--orange);text-transform:uppercase;}
+  nav .links{display:flex;gap:26px;align-items:center;}
+  nav .links a{font-size:11px;letter-spacing:3px;text-transform:uppercase;opacity:.75;transition:opacity .2s,color .2s;}
+  nav .links a:hover{opacity:1;color:var(--orange);}
+  nav .back{font-size:10px;letter-spacing:2px;opacity:.55;border:1px solid rgba(39,90,129,.35);padding:7px 12px;border-radius:20px;}
+  nav .back:hover{opacity:1;border-color:var(--orange);color:var(--orange);}
+  @media(max-width:760px){nav .links a:not(.back){display:none;}}
+
+  /* ── HERO: animated Bauhaus sun pattern ─────────────── */
+  .hero{position:relative;height:100vh;min-height:640px;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+  .pattern{position:absolute;inset:0;z-index:1;display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+    grid-auto-rows:120px;}
+  .tile{position:relative;overflow:hidden;}
+  .tile svg{width:100%;height:100%;display:block;}
+  /* gentle life in the pattern */
+  @keyframes spin{to{transform:rotate(360deg);}}
+  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.12);}}
+  @keyframes rays{to{transform:rotate(-360deg);}}
+  .tile .rot{transform-origin:50% 50%;animation:spin 26s linear infinite;}
+  .tile .pul{transform-origin:50% 50%;animation:pulse 6s ease-in-out infinite;}
+  .tile .ray{transform-origin:50% 50%;animation:rays 40s linear infinite;}
+
+  .hero-scrim{position:absolute;inset:0;z-index:2;pointer-events:none;
+    background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(238,229,207,.86) 0%,rgba(238,229,207,.5) 45%,rgba(238,229,207,.15) 100%);}
+  .hero-ui{position:relative;z-index:3;text-align:center;padding:0 24px;}
+  .hero-ui .sun{width:clamp(90px,12vw,140px);margin:0 auto 26px;animation:bob 5s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+  .hero-ui .word{width:min(660px,90vw);margin:0 auto;filter:drop-shadow(0 10px 30px rgba(39,90,129,.28));}
+  .hero-ui .tag{margin-top:22px;font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,3vw,34px);letter-spacing:.22em;color:var(--navy);text-transform:uppercase;}
+  .hero-ui .sub{margin-top:12px;font-size:11px;letter-spacing:5px;text-transform:uppercase;opacity:.6;}
+  .hero-ui .cta{display:inline-block;margin-top:30px;padding:13px 30px;background:var(--orange);color:var(--cream);
+    font-size:11px;letter-spacing:4px;text-transform:uppercase;border-radius:30px;transition:transform .25s,background .25s;}
+  .hero-ui .cta:hover{transform:translateY(-3px);background:var(--navy);}
+  .scroll-cue{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);z-index:3;font-size:9px;letter-spacing:4px;text-transform:uppercase;opacity:.5;animation:cue 2.2s infinite;}
+  @keyframes cue{0%,100%{opacity:.5;}50%{opacity:.12;}}
+
+  /* ── MARQUEE ─────────────────────────────────────────── */
+  .marquee{background:var(--navy);color:var(--cream);overflow:hidden;padding:13px 0;}
+  .marquee .trk{display:flex;gap:50px;white-space:nowrap;animation:scroll 30s linear infinite;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.18em;text-transform:uppercase;}
+  .marquee .trk b{color:var(--orange);}
+  @keyframes scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  /* ── SECTION SHELL ───────────────────────────────────── */
+  section{padding:96px 30px;max-width:1180px;margin:0 auto;}
+  .sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:42px;}
+  .sec-head h2{font-family:'Anton',sans-serif;font-size:clamp(30px,5vw,58px);text-transform:uppercase;letter-spacing:1px;line-height:.95;}
+  .sec-head .idx{font-size:11px;letter-spacing:3px;opacity:.45;}
+  .sec-head .line{flex:1;height:2px;background:rgba(39,90,129,.2);align-self:center;}
+
+  /* ── LATEST RELEASE ──────────────────────────────────── */
+  .feature{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:center;
+    background:#fff8ec;border:1px solid rgba(39,90,129,.15);border-radius:18px;padding:36px;box-shadow:0 30px 70px rgba(39,90,129,.10);}
+  .feature .art{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:1;box-shadow:0 24px 50px rgba(39,90,129,.25);}
+  .feature .art img{width:100%;height:100%;object-fit:cover;}
+  .feature .badge{position:absolute;top:14px;left:14px;background:var(--orange);color:var(--cream);font-size:9px;letter-spacing:2px;padding:6px 11px;border-radius:20px;text-transform:uppercase;}
+  .feature .cat{font-size:10px;letter-spacing:4px;color:var(--orange);text-transform:uppercase;}
+  .feature h3{font-family:'Anton',sans-serif;font-size:clamp(30px,4vw,52px);text-transform:uppercase;line-height:.95;margin:10px 0 6px;}
+  .feature .artist{font-size:13px;letter-spacing:1px;opacity:.7;margin-bottom:20px;}
+  .feature .tracks{list-style:none;margin:0 0 24px;border-top:1px solid rgba(39,90,129,.16);}
+  .feature .tracks li{display:flex;justify-content:space-between;padding:11px 2px;border-bottom:1px solid rgba(39,90,129,.12);font-size:12px;}
+  .feature .tracks li span:first-child{opacity:.45;margin-right:12px;}
+  .feature .tracks li .dur{opacity:.5;}
+  .btn-row{display:flex;gap:12px;flex-wrap:wrap;}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;font-size:11px;letter-spacing:3px;text-transform:uppercase;border-radius:30px;transition:transform .2s,background .2s,color .2s;}
+  .btn-fill{background:var(--navy);color:var(--cream);}
+  .btn-fill:hover{background:var(--orange);transform:translateY(-2px);}
+  .btn-line{border:1.5px solid var(--navy);color:var(--navy);}
+  .btn-line:hover{background:var(--navy);color:var(--cream);transform:translateY(-2px);}
+  @media(max-width:760px){.feature{grid-template-columns:1fr;gap:28px;padding:22px;}}
+
+  /* ── RELEASES GRID ───────────────────────────────────── */
+  .rel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:26px;}
+  .rel{cursor:pointer;}
+  .rel .cover{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:1;box-shadow:0 14px 30px rgba(39,90,129,.16);transition:transform .3s,box-shadow .3s;}
+  .rel:hover .cover{transform:translateY(-6px);box-shadow:0 26px 50px rgba(39,90,129,.28);}
+  .rel .cover img,.rel .cover svg{width:100%;height:100%;object-fit:cover;}
+  .rel .cover .play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;background:rgba(39,90,129,.35);transition:opacity .3s;font-size:34px;color:var(--cream);}
+  .rel:hover .cover .play{opacity:1;}
+  .rel .meta{padding:13px 2px 0;}
+  .rel .meta .c{font-size:9px;letter-spacing:3px;color:var(--orange);text-transform:uppercase;}
+  .rel .meta .t{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;line-height:1.05;margin-top:3px;}
+  .rel .meta .a{font-size:11px;opacity:.6;margin-top:2px;}
+
+  /* ── ARTISTS ─────────────────────────────────────────── */
+  .art-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:30px;}
+  .artist-c{text-align:center;cursor:pointer;}
+  .artist-c .av{width:100%;aspect-ratio:1;border-radius:50%;overflow:hidden;box-shadow:0 12px 28px rgba(39,90,129,.18);transition:transform .3s;}
+  .artist-c:hover .av{transform:scale(1.04) rotate(-2deg);}
+  .artist-c .av svg{width:100%;height:100%;}
+  .artist-c .n{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.05em;margin-top:14px;}
+  .artist-c .r{font-size:10px;letter-spacing:2px;opacity:.55;text-transform:uppercase;}
+
+  /* ── TOURS ───────────────────────────────────────────── */
+  .tour-list{border-top:2px solid rgba(39,90,129,.2);}
+  .tour{display:grid;grid-template-columns:120px 1fr auto;gap:20px;align-items:center;padding:22px 6px;border-bottom:1px solid rgba(39,90,129,.14);transition:background .2s,padding-left .2s;}
+  .tour:hover{background:#fff8ec;padding-left:16px;}
+  .tour .date{font-family:'Anton',sans-serif;font-size:22px;color:var(--navy);}
+  .tour .date small{display:block;font-family:'Space Mono';font-size:10px;letter-spacing:2px;opacity:.5;}
+  .tour .where .v{font-size:15px;font-weight:700;}
+  .tour .where .c{font-size:11px;letter-spacing:2px;opacity:.6;text-transform:uppercase;margin-top:3px;}
+  .tour .tix{font-size:10px;letter-spacing:3px;text-transform:uppercase;padding:9px 18px;border:1.5px solid var(--orange);color:var(--orange);border-radius:24px;transition:background .2s,color .2s;}
+  .tour .tix:hover{background:var(--orange);color:var(--cream);}
+  .tour.sold .tix{border-color:rgba(22,19,15,.25);color:rgba(22,19,15,.4);}
+  @media(max-width:680px){.tour{grid-template-columns:84px 1fr;}.tour .tix{grid-column:2;justify-self:start;margin-top:6px;}}
+
+  /* ── NEWS ────────────────────────────────────────────── */
+  .news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:26px;}
+  .news-c{background:#fff8ec;border:1px solid rgba(39,90,129,.14);border-radius:14px;overflow:hidden;cursor:pointer;transition:transform .3s,box-shadow .3s;}
+  .news-c:hover{transform:translateY(-5px);box-shadow:0 22px 44px rgba(39,90,129,.16);}
+  .news-c .top{height:8px;background:linear-gradient(90deg,var(--orange),var(--navy));}
+  .news-c .body{padding:22px;}
+  .news-c .tagline{font-size:9px;letter-spacing:3px;color:var(--orange);text-transform:uppercase;}
+  .news-c h4{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.03em;line-height:1.05;margin:8px 0 10px;}
+  .news-c p{font-size:12px;line-height:1.65;opacity:.7;}
+  .news-c .when{font-size:10px;letter-spacing:2px;opacity:.45;margin-top:14px;text-transform:uppercase;}
+
+  /* ── NEWSLETTER ──────────────────────────────────────── */
+  .signup{background:var(--navy);color:var(--cream);border-radius:22px;padding:60px 40px;text-align:center;margin:40px auto;max-width:1180px;}
+  .signup h2{font-family:'Anton',sans-serif;font-size:clamp(28px,4vw,48px);text-transform:uppercase;line-height:1;}
+  .signup p{opacity:.8;font-size:13px;margin:14px auto 26px;max-width:46ch;}
+  .signup form{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+  .signup input{padding:14px 20px;border:none;border-radius:30px;width:min(340px,80vw);font-family:'Space Mono';font-size:13px;}
+  .signup button{padding:14px 28px;border:none;border-radius:30px;background:var(--orange);color:var(--cream);font-family:'Space Mono';font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:transform .2s;}
+  .signup button:hover{transform:translateY(-2px);}
+
+  /* ── FOOTER ──────────────────────────────────────────── */
+  footer{background:var(--ink);color:var(--cream);padding:54px 30px 36px;}
+  .foot-in{max-width:1180px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:30px;}
+  .foot-in .brand{font-family:'Anton',sans-serif;font-size:30px;color:var(--orange);}
+  .foot-in .tag{font-size:11px;letter-spacing:3px;opacity:.6;margin-top:8px;text-transform:uppercase;}
+  .foot-col h5{font-size:10px;letter-spacing:3px;opacity:.5;text-transform:uppercase;margin-bottom:12px;}
+  .foot-col a{display:block;font-size:12px;opacity:.8;margin-bottom:8px;}
+  .foot-col a:hover{color:var(--orange);}
+  .foot-base{max-width:1180px;margin:34px auto 0;padding-top:20px;border-top:1px solid rgba(238,229,207,.16);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:10px;letter-spacing:2px;text-transform:uppercase;opacity:.55;}
+  .foot-base b{color:var(--elec-red);}
+
+  .reveal{opacity:0;transform:translateY(40px);transition:opacity .8s ease,transform .8s ease;}
+  .reveal.in{opacity:1;transform:none;}
+</style>
+</head>
+<body>
+
+  <nav>
+    <a href="#top" class="brand">Sundara</a>
+    <div class="links">
+      <a href="#releases">Releases</a>
+      <a href="#artists">Artists</a>
+      <a href="#tours">Tours</a>
+      <a href="#news">News</a>
+      <a href="Electric_Music_Website.html" class="back">↩ Electric Music</a>
+    </div>
+  </nav>
+
+  <header class="hero" id="top">
+    <div class="pattern" id="pattern"></div>
+    <div class="hero-scrim"></div>
+    <div class="hero-ui">
+      <img class="word" src="Web Assets/sundara_logo_transparent.png" alt="SUNDARA"
+           onerror="this.outerHTML='&lt;h1 style=\'font-family:Anton;font-size:clamp(56px,12vw,150px);color:var(--orange);letter-spacing:2px\'&gt;SUNDARA&lt;/h1&gt;'">
+      <p class="tag">Stay For Sunrise</p>
+      <p class="sub">Naarm / Melbourne · Est. 2024</p>
+      <a href="#releases" class="cta">Hear the latest →</a>
+    </div>
+    <span class="scroll-cue">Scroll ↓</span>
+  </header>
+
+  <div class="marquee"><div class="trk">
+    <span>Organic House <b>☀</b> Balearic <b>☀</b> Downtempo <b>☀</b> Melodic <b>☀</b> Stay For Sunrise <b>☀</b> Naarm / Melbourne <b>☀</b>&nbsp;</span>
+    <span>Organic House <b>☀</b> Balearic <b>☀</b> Downtempo <b>☀</b> Melodic <b>☀</b> Stay For Sunrise <b>☀</b> Naarm / Melbourne <b>☀</b>&nbsp;</span>
+  </div></div>
+
+  <!-- LATEST RELEASE -->
+  <section id="latest" class="reveal">
+    <div class="sec-head"><span class="idx">01</span><h2>Latest Release</h2><span class="line"></span></div>
+    <div class="feature">
+      <div class="art">
+        <span class="badge">New · SUN04</span>
+        <img src="Web Assets/sundara_cover_square.png" alt="" onerror="this.parentNode.innerHTML='&lt;div style=\'width:100%;height:100%;background:linear-gradient(135deg,var(--orange),var(--navy))\'&gt;&lt;/div&gt;'">
+      </div>
+      <div class="info">
+        <span class="cat">SUN04 · 12&quot; / Digital</span>
+        <h3>First Light</h3>
+        <p class="artist">Marisol Vega</p>
+        <ul class="tracks">
+          <li><span><span>A1</span>First Light</span><span class="dur">6:42</span></li>
+          <li><span><span>A2</span>Tidal Bloom</span><span class="dur">7:18</span></li>
+          <li><span><span>B1</span>Slow Horizon</span><span class="dur">8:04</span></li>
+          <li><span><span>B2</span>Amara (Sunrise Dub)</span><span class="dur">6:55</span></li>
+        </ul>
+        <div class="btn-row">
+          <a href="#" class="btn btn-fill">▶ Listen</a>
+          <a href="#" class="btn btn-line">Buy vinyl</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RELEASES -->
+  <section id="releases" class="reveal">
+    <div class="sec-head"><span class="idx">02</span><h2>Releases</h2><span class="line"></span></div>
+    <div class="rel-grid" id="relGrid"></div>
+  </section>
+
+  <!-- ARTISTS -->
+  <section id="artists" class="reveal">
+    <div class="sec-head"><span class="idx">03</span><h2>Artists</h2><span class="line"></span></div>
+    <div class="art-grid" id="artGrid"></div>
+  </section>
+
+  <!-- TOURS -->
+  <section id="tours" class="reveal">
+    <div class="sec-head"><span class="idx">04</span><h2>Tours &amp; Events</h2><span class="line"></span></div>
+    <div class="tour-list" id="tourList"></div>
+  </section>
+
+  <!-- NEWS -->
+  <section id="news" class="reveal">
+    <div class="sec-head"><span class="idx">05</span><h2>News</h2><span class="line"></span></div>
+    <div class="news-grid" id="newsGrid"></div>
+  </section>
+
+  <!-- NEWSLETTER -->
+  <div class="signup reveal">
+    <h2>Stay For Sunrise</h2>
+    <p>New releases, tour dates and sunrise sets — straight to your inbox. No noise, just the good stuff.</p>
+    <form onsubmit="this.querySelector('button').textContent='Welcome ☀';return false;">
+      <input type="email" placeholder="your@email.com" required>
+      <button type="submit">Subscribe</button>
+    </form>
+  </div>
+
+  <footer>
+    <div class="foot-in">
+      <div>
+        <div class="brand">SUNDARA</div>
+        <div class="tag">Stay For Sunrise · Naarm / Melbourne</div>
+      </div>
+      <div class="foot-col">
+        <h5>Explore</h5>
+        <a href="#releases">Releases</a>
+        <a href="#artists">Artists</a>
+        <a href="#tours">Tours</a>
+        <a href="#news">News</a>
+      </div>
+      <div class="foot-col">
+        <h5>Listen</h5>
+        <a href="#">Bandcamp</a><a href="#">Spotify</a><a href="#">SoundCloud</a><a href="#">Beatport</a>
+      </div>
+      <div class="foot-col">
+        <h5>Connect</h5>
+        <a href="#">Instagram</a><a href="#">Demos</a><a href="#">Bookings</a>
+        <a href="Electric_Music_Website.html">↩ Electric</a>
+      </div>
+    </div>
+    <div class="foot-base">
+      <span>Sundara © 2026 · A label under <b>⚡ Electric</b></span>
+      <span>One Current, Two Charges</span>
+    </div>
+  </footer>
+
+<script>
+  /* ── Build the Bauhaus sun pattern grid ── */
+  const NAVY='#275A81', ORANGE='#FC7218', CREAM='#EEE5CF', CREAMD='#E6D9BC';
+  const shapes = [
+    // quarter circle (rotating)
+    c => `<svg viewBox="0 0 100 100"><g class="rot"><path d="M0 100 A100 100 0 0 1 100 0 L100 100 Z" fill="${c.a}"/></g></svg>`,
+    // sun / full circle (pulsing)
+    c => `<svg viewBox="0 0 100 100"><circle class="pul" cx="50" cy="50" r="34" fill="${c.a}"/></svg>`,
+    // half circle
+    c => `<svg viewBox="0 0 100 100"><path d="M0 50 A50 50 0 0 1 100 50 Z" fill="${c.a}"/></svg>`,
+    // two quarter eye
+    c => `<svg viewBox="0 0 100 100"><path d="M0 0 A100 100 0 0 1 100 100 L0 100 Z" fill="${c.a}"/><circle cx="50" cy="50" r="16" fill="${c.b}"/></svg>`,
+    // sunburst rays (slow rotate)
+    c => {let r='';for(let i=0;i<12;i++){const a=i*30*Math.PI/180;r+=`<line x1="50" y1="50" x2="${50+46*Math.cos(a)}" y2="${50+46*Math.sin(a)}" stroke="${c.a}" stroke-width="5"/>`;}return `<svg viewBox="0 0 100 100"><g class="ray">${r}</g><circle cx="50" cy="50" r="12" fill="${c.b}"/></svg>`;},
+    // concentric
+    c => `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="${c.a}" stroke-width="6"/><circle class="pul" cx="50" cy="50" r="20" fill="${c.b}"/></svg>`,
+    // diagonal split
+    c => `<svg viewBox="0 0 100 100"><path d="M0 0 H100 V100 Z" fill="${c.a}"/></svg>`,
+  ];
+  const palettes = [
+    {bg:CREAM, a:NAVY, b:ORANGE},
+    {bg:CREAM, a:ORANGE, b:NAVY},
+    {bg:NAVY, a:ORANGE, b:CREAM},
+    {bg:ORANGE, a:NAVY, b:CREAM},
+    {bg:CREAMD, a:NAVY, b:ORANGE},
+  ];
+  (function buildPattern(){
+    const wrap=document.getElementById('pattern');
+    const cols=Math.ceil(window.innerWidth/120);
+    const rows=Math.ceil(window.innerHeight/120);
+    const n=cols*rows+cols;
+    let html='';
+    for(let i=0;i<n;i++){
+      const p=palettes[Math.floor(Math.random()*palettes.length)];
+      const s=shapes[Math.floor(Math.random()*shapes.length)];
+      const rot=[0,90,180,270][Math.floor(Math.random()*4)];
+      html+=`<div class="tile" style="background:${p.bg};transform:rotate(${rot}deg)">${s(p)}</div>`;
+    }
+    wrap.innerHTML=html;
+  })();
+
+  /* ── Geometric cover generator (Bauhaus) for placeholder releases ── */
+  function cover(seed){
+    const ps=palettes; let h=0; for(const ch of seed) h=(h*31+ch.charCodeAt(0))&0xffff;
+    const p=ps[h%ps.length];
+    const pick=[shapes[1],shapes[0],shapes[4],shapes[5],shapes[3]][h%5];
+    return `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" style="background:${p.bg}">
+      <rect width="100" height="100" fill="${p.bg}"/>
+      <g transform="translate(8 8) scale(.84)">${pick(p)}</g>
+      <circle cx="${20+h%50}" cy="${70-(h>>3)%40}" r="${10+h%14}" fill="${p.b}" opacity=".9"/>
+    </svg>`;
+  }
+
+  /* ── Data ── */
+  const releases=[
+    {c:'SUN04',t:'First Light',a:'Marisol Vega',img:'Web Assets/sundara_cover_square.png',year:'2026',fmt:'12" / Digital',
+      tracks:[['A1','First Light','6:42'],['A2','Tidal Bloom','7:18'],['B1','Slow Horizon','8:04'],['B2','Amara (Sunrise Dub)','6:55']]},
+    {c:'SUN03',t:'Tidal',a:'Kit Nakamura',year:'2026',fmt:'Digital',
+      tracks:[['1','Tidal','7:02'],['2','Undertow','6:40'],['3','Reef Lights','8:11']]},
+    {c:'SUN02',t:'Golden Hour',a:'Solène',year:'2025',fmt:'12" / Digital',
+      tracks:[['A1','Golden Hour','6:28'],['A2','Lilac Sky','7:50'],['B1','Afterglow','9:02']]},
+    {c:'SUN01',t:'Horizon Line',a:'Dustin Reef',year:'2025',fmt:'Digital',
+      tracks:[['1','Horizon Line','7:14'],['2','Saltwater','6:33'],['3','Drift (Dawn Mix)','8:20']]},
+    {c:'SUN00',t:'Sunrise Sessions Vol.1',a:'Various',year:'2024',fmt:'Compilation',
+      tracks:[['1','Marisol Vega — Bloom','6:10'],['2','Solène — Cirrus','7:22'],['3','Kit Nakamura — Tide','6:48'],['4','Amara Lune — Halo','8:05']]},
+  ];
+  document.getElementById('relGrid').innerHTML=releases.map((r,i)=>`
+    <div class="rel" onclick="openRelease(${i})">
+      <div class="cover">${r.img?`<img src="${r.img}" onerror="this.outerHTML=cover('${r.c}')">`:cover(r.c+r.t)}<div class="play">▶</div></div>
+      <div class="meta"><div class="c">${r.c}</div><div class="t">${r.t}</div><div class="a">${r.a}</div></div>
+    </div>`).join('');
+
+  const artists=[
+    {n:'Marisol Vega',r:'Producer',bio:'Naarm-based producer weaving organic house with field recordings from the Victorian coast. Her warm, melodic palette defined Sundara\'s debut, First Light.'},
+    {n:'Kit Nakamura',r:'Live',bio:'Tokyo-to-Melbourne live performer blending modular synthesis and balearic guitar. Known for sunrise sets that stretch past three hours.'},
+    {n:'Solène',r:'DJ / Producer',bio:'French-Australian selector with a gift for the golden-hour groove — downtempo, dusty, and unhurried. A resident across Sundara\'s rooftop series.'},
+    {n:'Dustin Reef',r:'Producer',bio:'Surf-town producer making saltwater house. Records to tape, mixes at dawn, and rarely plays the same edit twice.'},
+    {n:'Amara Lune',r:'Vocalist',bio:'Vocalist and topliner whose airy, wordless melodies float through the Sundara catalogue. Solo debut due late 2026.'},
+    {n:'Leon Further',r:'DJ',bio:'Crate-digging DJ with a bottomless bag of balearic obscurities. Curates the Sunrise Sessions compilations.'},
+  ];
+  const ALINKS=[['Instagram','#'],['SoundCloud','#'],['Spotify','#'],['Bookings','#']];
+  document.getElementById('artGrid').innerHTML=artists.map((a,i)=>`
+    <div class="artist-c" onclick="openArtist(${i})"><div class="av">${cover(a.n)}</div><div class="n">${a.n}</div><div class="r">${a.r}</div></div>`).join('');
+
+  const tours=[
+    {d:'18',m:'Jun',v:'Sundara Sunrise · Rooftop',c:'Naarm / Melbourne',sold:false},
+    {d:'05',m:'Jul',v:'Balearic Open Air',c:'Sydney',sold:false},
+    {d:'19',m:'Jul',v:'Watergate',c:'Berlin',sold:true},
+    {d:'02',m:'Aug',v:'Beach Sessions',c:'Lisbon',sold:false},
+    {d:'23',m:'Aug',v:'Sunrise Set · Closing',c:'Ibiza',sold:false},
+  ];
+  document.getElementById('tourList').innerHTML=tours.map(t=>`
+    <div class="tour ${t.sold?'sold':''}">
+      <div class="date">${t.d}<small>${t.m} 2026</small></div>
+      <div class="where"><div class="v">${t.v}</div><div class="c">${t.c}</div></div>
+      <a class="tix" href="#">${t.sold?'Sold Out':'Tickets'}</a>
+    </div>`).join('');
+
+  const news=[
+    {tag:'Release',t:'SUN04 — First Light is here',p:'Marisol Vega opens the season with four cuts of warm, melodic house built for the break of day.',w:'June 2026'},
+    {tag:'Label',t:'Sundara joins the Electric family',p:'The sunrise twin to Midnite Arcade — one current, two charges. Read the story behind the label.',w:'May 2026'},
+    {tag:'Event',t:'Rooftop sunrise series returns',p:'Five mornings of balearic, downtempo and organic house across the Naarm summer.',w:'May 2026'},
+  ];
+  document.getElementById('newsGrid').innerHTML=news.map(n=>`
+    <div class="news-c"><div class="top"></div><div class="body">
+      <div class="tagline">${n.tag}</div><h4>${n.t}</h4><p>${n.p}</p><div class="when">${n.w}</div>
+    </div></div>`).join('');
+
+  /* reveal on scroll */
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');}),{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

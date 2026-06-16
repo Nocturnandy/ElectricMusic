@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ELECTRIC ⚡ From Midnite to Sunrise</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=Anton&display=swap');
+  :root{
+    --cream:#EEE5CF; --ink:#0A0A0A; --elec-red:#A22021;
+    --sun-orange:#FC7218; --sun-navy:#275A81; --ma-red:#E23125;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--ink);color:var(--cream);font-family:'Space Mono',monospace;overflow-x:hidden;}
+  ::selection{background:var(--elec-red);color:var(--cream);}
+
+  body::after{
+    content:'';position:fixed;inset:0;z-index:99;pointer-events:none;opacity:.07;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ── floating palms, swaying in the wind ── */
+  .palm{position:fixed;z-index:40;pointer-events:none;width:min(44vw,520px);height:auto;
+    filter:drop-shadow(0 18px 40px rgba(0,0,0,.35));}
+  .palm-bl{bottom:-6%;left:-7%;transform-origin:8% 96%;animation:swayBL 7s ease-in-out infinite alternate;}
+  .palm-tr{top:-6%;right:-7%;transform-origin:94% 6%;animation:swayTR 8.5s ease-in-out infinite alternate;}
+  @keyframes swayBL{
+    0%{transform:rotate(-4.5deg) translate(-10px,4px) skewY(-1deg);}
+    35%{transform:rotate(1deg) translate(0,-3px) skewY(.6deg);}
+    65%{transform:rotate(3deg) translate(8px,2px) skewY(-.4deg);}
+    100%{transform:rotate(5.5deg) translate(14px,-5px) skewY(1.2deg);}}
+  @keyframes swayTR{
+    0%{transform:rotate(5deg) translate(10px,-4px) skewX(1deg);}
+    40%{transform:rotate(-1deg) translate(-2px,3px) skewX(-.6deg);}
+    70%{transform:rotate(-3.5deg) translate(-9px,-2px) skewX(.5deg);}
+    100%{transform:rotate(-5.5deg) translate(-15px,5px) skewX(-1.2deg);}}
+  body.no-palms .palm{display:none;}
+  .palm-toggle{background:none;border:none;cursor:pointer;font-size:16px;line-height:1;padding:0 2px;
+    opacity:.9;transition:opacity .3s,transform .3s;}
+  .palm-toggle:hover{transform:scale(1.15);}
+  body.no-palms .palm-toggle{opacity:.35;filter:grayscale(1);}
+
+  nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:18px 28px;mix-blend-mode:difference;}
+  nav .brand{font-size:12px;letter-spacing:4px;text-transform:uppercase;font-weight:700;display:flex;align-items:center;gap:8px;}
+  nav .bolt-ico{height:14px;width:auto;display:block;}
+  nav .links{display:flex;gap:26px;}
+  nav a{color:inherit;text-decoration:none;font-size:10px;letter-spacing:3px;text-transform:uppercase;opacity:.8;}
+  nav a:hover{opacity:1;}
+
+  /* ── hero: smoke movie + 3D fracturing bolts ── */
+  .hero{position:relative;height:100vh;overflow:hidden;cursor:pointer;
+    background:#0A0A0A url('https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260612_025032_2932aef7-64d9-47e1-ba5e-51ee7718dcd9.png') center/cover no-repeat;}
+  .hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;
+    filter:blur(7px) brightness(.92);transform:scale(1.06);} /* blur hides upscale artifacts; scale hides soft edges */
+  .hero::before{content:'';position:absolute;inset:0;z-index:1;
+    background:linear-gradient(to bottom,rgba(10,10,10,.55),transparent 35%,transparent 70%,rgba(10,10,10,.9));}
+  .smoke{position:absolute;inset:-20%;z-index:2;pointer-events:none;mix-blend-mode:screen;filter:blur(40px);opacity:.3;}
+  .smoke.s1{background:radial-gradient(ellipse 40% 24% at 30% 78%, rgba(200,195,180,.16), transparent 70%),radial-gradient(ellipse 34% 20% at 75% 84%, rgba(180,175,165,.12), transparent 70%);animation:drift1 26s ease-in-out infinite alternate;}
+  .smoke.s2{background:radial-gradient(ellipse 46% 26% at 60% 80%, rgba(190,185,175,.13), transparent 70%),radial-gradient(ellipse 30% 18% at 18% 86%, rgba(170,165,155,.1), transparent 70%);animation:drift2 34s ease-in-out infinite alternate;}
+  @keyframes drift1{from{transform:translateX(-4%) scale(1)}to{transform:translateX(5%) scale(1.08)}}
+  @keyframes drift2{from{transform:translateX(4%) scale(1.05)}to{transform:translateX(-5%) scale(1)}}
+  #gl{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:3;}
+
+  .hero-ui{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:11vh;pointer-events:none;}
+  .hero-logo{width:min(440px,68vw);height:auto;filter:drop-shadow(0 8px 40px rgba(0,0,0,.9));}
+  .hero-music{width:min(440px,68vw);
+    padding-left:1.53%;padding-right:1.89%; /* exact transparent margins measured in the logo PNG */
+    margin-top:12px;filter:drop-shadow(0 6px 22px rgba(0,0,0,.85));}
+  .hero-music .bar{background:var(--cream);color:var(--elec-red);
+    display:flex;justify-content:space-between;align-items:center;
+    padding:.3em 5% .24em;line-height:1;
+    font-family:'Anton',sans-serif;font-weight:400;
+    font-size:clamp(30px,5.2vw,50px);text-transform:uppercase;
+    box-shadow:0 10px 50px rgba(0,0,0,.55);}
+  .hero-music .bar span{display:block;}
+  .hero-music .bar .b{color:#16130F;font-size:.66em;transform:translateY(-.03em);}
+  .hero .kicker{font-size:11px;letter-spacing:8px;text-transform:uppercase;margin-top:30px;opacity:.85;}
+  .hero .kicker em{font-style:normal;color:var(--ma-red);}
+  .hero .strike-hint{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:4px;text-transform:uppercase;opacity:.5;animation:cue 2.2s infinite;}
+  @keyframes cue{0%,100%{opacity:.5}50%{opacity:.12}}
+  .loading{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;font-size:10px;letter-spacing:6px;text-transform:uppercase;opacity:.6;transition:opacity .6s;}
+  .loading.hide{opacity:0;pointer-events:none;}
+
+  .marquee{border-top:1px solid rgba(238,229,207,.18);border-bottom:1px solid rgba(238,229,207,.18);overflow:hidden;padding:14px 0;background:var(--ink);position:relative;z-index:5;}
+  .marquee .track{display:flex;gap:60px;white-space:nowrap;animation:scroll 28s linear infinite;font-size:12px;letter-spacing:5px;text-transform:uppercase;}
+  .marquee span b{color:var(--elec-red);}
+  @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* ── label select: split screen, floating CDs ── */
+  .select{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;}
+  .pick{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;
+    padding:12vh 6vw;text-decoration:none;overflow:hidden;
+    opacity:0;transform:translateY(60px);transition:opacity .9s ease,transform .9s ease;}
+  .pick.inview{opacity:1;transform:none;}
+  .pick .num{font-size:10px;letter-spacing:5px;text-transform:uppercase;opacity:.55;}
+  .pick .motto{font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,2.6vw,36px);letter-spacing:.08em;text-transform:uppercase;}
+  .pick .enter{border:1.5px solid currentColor;padding:11px 28px;font-size:11px;letter-spacing:3px;text-transform:uppercase;transition:background .3s,color .3s,border-color .3s;}
+
+  /* info panel — revealed on hover */
+  .pick-info{max-width:380px;max-height:0;overflow:hidden;opacity:0;
+    transform:translateY(8px);
+    transition:max-height .6s cubic-bezier(.2,.75,.25,1),opacity .5s ease,transform .5s ease,margin .5s ease;}
+  .pick:hover .pick-info{max-height:280px;opacity:1;transform:none;margin:-8px 0 4px;}
+  .pi-blurb{font-size:12px;line-height:1.7;opacity:.78;margin:0 auto 18px;max-width:34ch;text-align:center;}
+  .pi-meta{display:flex;flex-direction:column;gap:9px;margin:0 auto;width:max-content;text-align:left;}
+  .pi-meta>div{display:flex;align-items:baseline;gap:14px;}
+  .pi-meta dt{font-size:8px;letter-spacing:3px;text-transform:uppercase;opacity:.5;min-width:74px;margin:0;}
+  .pi-meta dd{font-size:11px;letter-spacing:1px;margin:0;opacity:.9;}
+  .pick-ma .pi-meta dd{color:var(--cream);}
+  .pick-su .pi-meta dd{color:#16130F;}
+  .pick-ma{background:var(--ink);color:var(--cream);}
+  .pick-ma .motto{color:var(--ma-red);}
+  .pick-ma:hover .enter{background:var(--ma-red);border-color:var(--ma-red);color:var(--cream);}
+  .pick-su{background:var(--cream);color:#16130F;}
+  .pick-su .motto{color:var(--sun-orange);}
+  .pick-su:hover .enter{background:var(--sun-orange);border-color:var(--sun-orange);color:var(--cream);}
+
+  /* photoreal jewel cases + discs (Higgsfield cutouts), layered 3D */
+  .cd{position:relative;width:min(28vw,330px);perspective:1000px;animation:float 6s ease-in-out infinite alternate;}
+  .pick-su .cd{animation-duration:7.2s;}
+  @keyframes float{from{transform:translateY(-10px) rotate(-1deg)}to{transform:translateY(12px) rotate(1deg)}}
+  .cd .tilt{position:relative;width:100%;transform-style:preserve-3d;transition:transform .25s ease-out;}
+  /* the disc: hides behind the case, slides out on hover */
+  .disc-wrap{position:absolute;top:6%;left:8%;width:84%;z-index:1;
+    transition:transform .85s cubic-bezier(.2,.75,.25,1);}
+  .disc-wrap img{display:block;width:100%;height:auto;
+    filter:drop-shadow(0 16px 30px rgba(0,0,0,.45));}
+  .pick:hover .disc-wrap{transform:translate(82%,-6%) scale(.96);}
+  .pick:hover .disc-wrap img{animation:discspin 5s linear infinite;}
+  @keyframes discspin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+  /* the case */
+  .cd img.case{position:relative;z-index:2;display:block;width:100%;height:auto;
+    filter:drop-shadow(0 30px 60px rgba(0,0,0,.5));
+    transition:filter .5s ease;}
+  .pick-su .cd img.case{filter:drop-shadow(0 30px 60px rgba(70,45,12,.35));}
+  .pick:hover .cd img.case{filter:drop-shadow(0 40px 80px rgba(0,0,0,.55));}
+
+  .manifesto{position:relative;min-height:64vh;display:flex;align-items:center;justify-content:center;text-align:center;background:#101010 url('https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260612_022810_77831ba9-ff8d-40d2-871a-a2781c3f440c.png') center/cover fixed no-repeat;}
+  .manifesto::after{content:'';position:absolute;inset:0;background:rgba(10,10,10,.66);}
+  .manifesto blockquote{position:relative;z-index:2;font-family:'Bebas Neue',sans-serif;font-weight:400;letter-spacing:.03em;font-size:clamp(30px,4.6vw,64px);text-transform:uppercase;line-height:1.2;max-width:22ch;padding:0 20px;}
+  .manifesto blockquote em{font-style:normal;color:var(--sun-orange);}
+
+  footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:26px 28px;font-size:10px;letter-spacing:2px;text-transform:uppercase;border-top:1px solid rgba(238,229,207,.18);}
+  footer b{color:var(--elec-red);}
+  @media(max-width:760px){.select{grid-template-columns:1fr;} .cd{width:min(64vw,330px);} nav .links{display:none;}}
+
+  /* ─── TV WALL ─────────────────────────────────────────────────────── */
+  .tv-wall{
+    position:relative;min-height:90vh;
+    background:#050505 url('https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260612_112155_9a0bc9f6-ccb2-482f-94c8-49a19a58219c.png') center/cover no-repeat;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:80px 40px 110px;overflow:hidden;
+  }
+  .tv-wall::before{
+    content:'';position:absolute;inset:0;z-index:1;
+    background:linear-gradient(to bottom,rgba(5,5,5,.65) 0%,rgba(5,5,5,.18) 28%,rgba(5,5,5,.18) 72%,rgba(5,5,5,.8) 100%);
+  }
+  .tv-wall-hd{
+    position:relative;z-index:3;
+    font-family:'Bebas Neue',sans-serif;font-size:clamp(18px,2.4vw,32px);
+    letter-spacing:.18em;text-transform:uppercase;
+    color:rgba(238,229,207,.38);margin-bottom:60px;
+  }
+  .tv-grid{
+    position:relative;z-index:3;
+    display:grid;grid-template-columns:repeat(2,1fr);
+    gap:44px 54px;max-width:520px;width:90%;
+  }
+  .tv-item{display:flex;flex-direction:column;align-items:center;gap:10px;}
+  /* individual tilt per TV for organic stacked feel */
+  .tv-item:nth-child(1) .tv{transform:rotate(-1.3deg);}
+  .tv-item:nth-child(2) .tv{transform:rotate(1.6deg) translateY(6px);}
+  .tv-item:nth-child(3) .tv{transform:rotate(.8deg) translateY(-4px);}
+  .tv-item:nth-child(4) .tv{transform:rotate(-1.9deg) translateY(5px);}
+  .tv{
+    width:100%;
+    background:linear-gradient(158deg,#2e2e2e 0%,#141414 100%);
+    border-radius:18px 18px 10px 10px;
+    padding:12px 14px 22px;
+    box-shadow:
+      inset 0 2px 3px rgba(255,255,255,.04),
+      inset 0 -5px 14px rgba(0,0,0,.75),
+      0 18px 60px rgba(0,0,0,.95),
+      0 4px 10px rgba(0,0,0,.8);
+    border:1.5px solid #0e0e0e;
+  }
+  /* subtle plastic texture lines across bezel */
+  .tv::after{
+    content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    background-image:repeating-linear-gradient(92deg,rgba(255,255,255,.012) 0px,rgba(255,255,255,.012) 1px,transparent 1px,transparent 7px);
+  }
+  .tv-screen{
+    position:relative;overflow:hidden;border-radius:6px;
+    border:3px solid #060606;aspect-ratio:1/1;background:#000;
+    box-shadow:inset 0 0 28px rgba(0,0,0,.95);
+  }
+  .tv-screen img{
+    display:block;width:100%;height:100%;object-fit:cover;
+    filter:brightness(.78) contrast(1.08) saturate(.8);
+  }
+  /* CRT scanlines */
+  .tv-scanlines{
+    position:absolute;inset:0;pointer-events:none;z-index:2;
+    background:repeating-linear-gradient(
+      0deg,
+      rgba(0,0,0,0) 0px,rgba(0,0,0,0) 2px,
+      rgba(0,0,0,.22) 2px,rgba(0,0,0,.22) 4px
+    );
+  }
+  /* curved-screen vignette */
+  .tv-vignette{
+    position:absolute;inset:0;pointer-events:none;z-index:3;
+    background:radial-gradient(ellipse 100% 100% at 50% 50%,transparent 38%,rgba(0,0,0,.65) 100%);
+  }
+  /* screen surface glare */
+  .tv-glare{
+    position:absolute;inset:0;pointer-events:none;z-index:4;
+    background:linear-gradient(128deg,rgba(255,255,255,.065) 0%,transparent 44%);
+  }
+  .tv-foot{
+    margin-top:8px;display:flex;justify-content:space-between;align-items:center;padding:0 2px;
+  }
+  .tv-brand-lbl{
+    font-size:6px;letter-spacing:4px;text-transform:uppercase;
+    color:rgba(238,229,207,.16);font-family:'Space Mono',monospace;
+  }
+  .tv-grille{display:flex;flex-direction:column;gap:2.5px;}
+  .tv-grille span{
+    display:block;width:24px;height:2px;
+    background:repeating-linear-gradient(90deg,rgba(255,255,255,.07) 0,rgba(255,255,255,.07) 2px,transparent 2px,transparent 4px);
+  }
+  .tv-label{
+    font-size:8px;letter-spacing:3px;text-transform:uppercase;
+    color:rgba(238,229,207,.32);text-align:center;
+  }
+  /* CRT phosphor flicker on select TVs */
+  @keyframes crt-flicker{
+    0%,100%{opacity:1} 4%{opacity:.93} 7%{opacity:1} 92%{opacity:.96} 96%{opacity:1}
+  }
+  .tv-item:nth-child(1) .tv-screen img{animation:crt-flicker 9s infinite;}
+  .tv-item:nth-child(3) .tv-screen img{animation:crt-flicker 13s 3.5s infinite;}
+  /* SVG wire overlay */
+  .tv-wires{
+    position:absolute;inset:0;width:100%;height:100%;
+    z-index:2;pointer-events:none;overflow:visible;
+  }
+  @media(max-width:760px){
+    .tv-grid{max-width:330px;gap:28px 24px;}
+    .tv-wall-hd{margin-bottom:36px;}
+    .tv-wall{padding:60px 20px 80px;}
+  }
+</style>
+</head>
+<body>
+
+  <img class="palm palm-bl" src="https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260612_131434_7de9494e-dc89-466b-8c5d-99a42e8aacc8.png" alt="">
+  <img class="palm palm-tr" src="https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260612_131437_c78ad0a1-b8cb-4cbc-806d-e0c85bffc806.png" alt="">
+
+  <nav>
+    <span class="brand">Electric Music
+      <svg class="bolt-ico" viewBox="0 0 24 32" aria-hidden="true"><path d="M13 0 L3 14 H9 L5 30 L21 11 H13 L17 0 Z" fill="currentColor"/></svg>
+    </span>
+    <div class="links">
+      <a href="Midnite_Arcade_Site.html">Midnite Arcade</a>
+      <a href="Sundara_Site.html">Sundara</a>
+      <a href="#releases">Releases</a>
+      <a href="#manifesto">Manifesto</a>
+      <button class="palm-toggle" id="palmToggle" title="Toggle palms" aria-label="Toggle palms">🌴</button>
+    </div>
+  </nav>
+
+  <header class="hero" id="hero">
+    <video class="hero-video" autoplay muted loop playsinline
+      poster="https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260612_025032_2932aef7-64d9-47e1-ba5e-51ee7718dcd9.png"
+      src="https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260612_053516_aecc42c3-1d34-4bc4-9c11-4650d830e50b.mp4"></video>
+    <div class="smoke s1"></div>
+    <div class="smoke s2"></div>
+    <canvas id="gl"></canvas>
+    <div class="loading" id="loading">Casting concrete…</div>
+    <div class="hero-ui">
+      <img class="hero-logo" src="Web Assets/electric_logo.png" alt="ELECTRIC">
+      <div class="hero-music" aria-label="MUSIC">
+        <div class="bar">
+          <span class="b">⚡</span>
+          <span>M</span><span>U</span><span>S</span><span>I</span><span>C</span>
+          <span class="b">⚡</span>
+        </div>
+      </div>
+      <p class="kicker">From <em>Midnite</em> · To <em style="color:var(--sun-orange)">Sunrise</em></p>
+    </div>
+    <span class="strike-hint">⚡ Click the bolts to break them</span>
+  </header>
+
+  <div class="marquee"><div class="track">
+    <span>Play Past Midnite <b>⚡</b> Stay For Sunrise <b>⚡</b> Naarm / Melbourne <b>⚡</b> Independent Music <b>⚡</b> One Current, Two Charges <b>⚡</b>&nbsp;</span>
+    <span>Play Past Midnite <b>⚡</b> Stay For Sunrise <b>⚡</b> Naarm / Melbourne <b>⚡</b> Independent Music <b>⚡</b> One Current, Two Charges <b>⚡</b>&nbsp;</span>
+  </div></div>
+
+  <main class="select">
+    <a class="pick pick-ma" id="midnite-arcade" href="Midnite_Arcade_Site.html">
+      <span class="num">Level 01 — The Night</span>
+      <div class="cd"><div class="tilt">
+        <div class="disc-wrap"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260612_130200_7d76490c-43a3-44ad-8504-37358b11dd5d.png" alt=""></div>
+        <img class="case" src="https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260612_125853_a59ea7a8-7c8a-40fb-be78-110c7873eb68.png" alt="Midnite Arcade CD">
+      </div></div>
+      <span class="motto">Play Past Midnite</span>
+      <div class="pick-info">
+        <p class="pi-blurb">Late-night sounds for the floor and beyond — warehouse cuts, after-dark electronics and the hum of the arcade at 3am.</p>
+        <dl class="pi-meta">
+          <div><dt>Sound</dt><dd>House · Techno · Electro</dd></div>
+          <div><dt>Catalogue</dt><dd>MA01 →</dd></div>
+          <div><dt>Mood</dt><dd>Neon · Restless · Nocturnal</dd></div>
+        </dl>
+      </div>
+      <span class="enter">Enter the night →</span>
+    </a>
+
+    <a class="pick pick-su" id="sundara" href="Sundara_Site.html">
+      <span class="num">Level 02 — The Morning</span>
+      <div class="cd"><div class="tilt">
+        <div class="disc-wrap"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260612_130202_3236f44f-3cb0-474c-9292-d77fdeadbc77.png" alt=""></div>
+        <img class="case" src="https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260612_125855_84535b6b-9839-46f7-9389-81210a348d2d.png" alt="Sundara CD">
+      </div></div>
+      <span class="motto">Stay For Sunrise</span>
+      <div class="pick-info">
+        <p class="pi-blurb">Organic, melodic house and balearic downtempo for the first light — sun-warmed grooves to carry the night home.</p>
+        <dl class="pi-meta">
+          <div><dt>Sound</dt><dd>Melodic · Balearic · Downtempo</dd></div>
+          <div><dt>Catalogue</dt><dd>SUN01 →</dd></div>
+          <div><dt>Mood</dt><dd>Golden · Open · Euphoric</dd></div>
+        </dl>
+      </div>
+      <span class="enter">Enter the morning →</span>
+    </a>
+  </main>
+
+  <!-- ── TV Wall: Releases ── -->
+  <section class="tv-wall" id="releases">
+
+    <!-- SVG cables + wires running between/around TVs -->
+    <svg class="tv-wires" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <!-- ceiling cable bundle -->
+      <path d="M0,38 C 160,54 310,42 460,50 C 610,58 760,44 910,51 L1000,47" stroke="#1d1d1d" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <path d="M0,46 C 160,62 310,50 460,58 C 610,66 760,52 910,59 L1000,55" stroke="#121212" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <!-- left wall vertical cable -->
+      <path d="M26,150 C 22,330 20,520 16,710" stroke="#141414" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <!-- right wall vertical cable -->
+      <path d="M974,148 C 978,328 980,518 984,708" stroke="#161616" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <!-- drop cables from ceiling to TVs -->
+      <path d="M342,50 C 338,108 334,164 330,218" stroke="#1b1b1b" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <path d="M658,46 C 662,106 666,162 670,216" stroke="#191919" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <path d="M342,53 C 335,172 332,324 336,440" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M658,49 C 665,168 668,322 664,438" stroke="#1d1d1d" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <!-- horizontal cable top pair of TVs, drooping -->
+      <path d="M478,254 C 490,282 510,282 522,254" stroke="#1f1f1f" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+      <!-- horizontal cable bottom pair of TVs, drooping -->
+      <path d="M480,536 C 491,562 509,562 520,536" stroke="#1b1b1b" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+      <!-- left side vertical linking top-left to bottom-left -->
+      <path d="M246,396 C 242,416 242,436 245,460" stroke="#1d1d1d" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+      <!-- right side vertical -->
+      <path d="M754,394 C 758,415 757,436 754,460" stroke="#191919" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+      <!-- diagonal crossing cable (atmospheric) -->
+      <path d="M482,294 C 499,346 501,398 518,460" stroke="#171717" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <!-- floor cable sweep -->
+      <path d="M0,726 C 210,710 400,722 500,715 C 660,706 820,718 1000,710" stroke="#171717" stroke-width="6.5" fill="none" stroke-linecap="round"/>
+      <path d="M0,736 C 190,724 370,732 550,725 C 730,718 870,730 1000,724" stroke="#101010" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <!-- cables draping to floor -->
+      <path d="M288,608 C 283,654 275,706 268,800" stroke="#1b1b1b" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+      <path d="M712,606 C 720,652 728,705 734,800" stroke="#1a1a1a" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+      <!-- extra atmospheric cable meandering across mid-section -->
+      <path d="M60,420 C 140,410 220,425 300,418 C 380,412 440,432 480,440" stroke="#131313" stroke-width="3" fill="none" stroke-linecap="round"/>
+    </svg>
+
+    <p class="tv-wall-hd">Releases</p>
+
+    <div class="tv-grid">
+
+      <div class="tv-item">
+        <div class="tv">
+          <div class="tv-screen">
+            <img src="Web Assets/ma_cover_square.png" alt="Midnite Arcade — Play Past Midnite">
+            <div class="tv-scanlines"></div>
+            <div class="tv-vignette"></div>
+            <div class="tv-glare"></div>
+          </div>
+          <div class="tv-foot">
+            <span class="tv-brand-lbl">Electric</span>
+            <span class="tv-grille"><span></span><span></span><span></span></span>
+          </div>
+        </div>
+        <p class="tv-label">Midnite Arcade</p>
+      </div>
+
+      <div class="tv-item">
+        <div class="tv">
+          <div class="tv-screen">
+            <img src="Web Assets/sundara_cover_square.png" alt="Sundara">
+            <div class="tv-scanlines"></div>
+            <div class="tv-vignette"></div>
+            <div class="tv-glare"></div>
+          </div>
+          <div class="tv-foot">
+            <span class="tv-brand-lbl">Electric</span>
+            <span class="tv-grille"><span></span><span></span><span></span></span>
+          </div>
+        </div>
+        <p class="tv-label">Sundara</p>
+      </div>
+
+      <div class="tv-item">
+        <div class="tv">
+          <div class="tv-screen">
+            <img src="Web Assets/F71C350D-4D97-45AA-9863-4DAC77F4FA7B.png" alt="Midnite Arcade MA01 — Green">
+            <div class="tv-scanlines"></div>
+            <div class="tv-vignette"></div>
+            <div class="tv-glare"></div>
+          </div>
+          <div class="tv-foot">
+            <span class="tv-brand-lbl">Electric</span>
+            <span class="tv-grille"><span></span><span></span><span></span></span>
+          </div>
+        </div>
+        <p class="tv-label">MA01 — Green</p>
+      </div>
+
+      <div class="tv-item">
+        <div class="tv">
+          <div class="tv-screen">
+            <img src="Web Assets/76A476FA-853D-4653-AFE9-DEB32A90D8F2.png" alt="Midnite Arcade MA01 — Black">
+            <div class="tv-scanlines"></div>
+            <div class="tv-vignette"></div>
+            <div class="tv-glare"></div>
+          </div>
+          <div class="tv-foot">
+            <span class="tv-brand-lbl">Electric</span>
+            <span class="tv-grille"><span></span><span></span><span></span></span>
+          </div>
+        </div>
+        <p class="tv-label">MA01 — Black</p>
+      </div>
+
+    </div>
+
+  </section>
+
+  <section class="manifesto" id="manifesto">
+    <blockquote>Play past midnite.<br><em>Stay for sunrise.</em></blockquote>
+  </section>
+
+  <footer>
+    <span>Electric © 2026</span>
+    <span><b>⚡⚡⚡</b> One current, two charges</span>
+    <span>Naarm / Melbourne</span>
+  </footer>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const GLB_URL = 'https://d3u0tzju9qaucj.cloudfront.net/7d051b5a-7bfe-49fe-a484-24e7b3a9458a/d10ca46a-1952-4dd7-bd4f-7f7c61ddbc99.glb';
+const FRAGS = 24;          // voronoi fragments
+const NEIGHBORS = 7;       // bisector planes per fragment
+const GRAVITY = 7.5;
+
+const hero = document.getElementById('hero');
+const canvas = document.getElementById('gl');
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.localClippingEnabled = true;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+camera.position.set(0, 0.35, 6.4);
+
+scene.add(new THREE.AmbientLight(0xEEE5CF, .26));
+const key = new THREE.DirectionalLight(0xffe9c9, 2.2); key.position.set(-1.5,6,3.5); scene.add(key);
+const rim = new THREE.PointLight(0xA22021, 16, 24); rim.position.set(4.4,1.2,-2.4); scene.add(rim);
+const fill = new THREE.DirectionalLight(0x8898a8, .35); fill.position.set(3,-2,5); scene.add(fill);
+
+const root = new THREE.Group(); scene.add(root);
+
+const frags = [];
+let mode = 'whole';        // whole | crack | fly | return
+let modeStart = 0;
+let floorY = -1.6;
+let dust = null;
+
+new GLTFLoader().load(GLB_URL, (gltf)=>{
+  const src = gltf.scene;
+  const box = new THREE.Box3().setFromObject(src);
+  const size = box.getSize(new THREE.Vector3());
+  const scale = 3.4/Math.max(size.x,size.y,size.z);
+  src.scale.setScalar(scale);
+  const box2 = new THREE.Box3().setFromObject(src);
+  const c = box2.getCenter(new THREE.Vector3());
+  src.position.sub(c);
+  const box3 = new THREE.Box3().setFromObject(src);
+  floorY = box3.min.y;
+  const hx = (box3.max.x-box3.min.x)/2, hy=(box3.max.y-box3.min.y)/2, hz=(box3.max.z-box3.min.z)/2;
+
+  // voronoi seeds inside the bounding volume
+  const seeds = [];
+  for(let i=0;i<FRAGS;i++){
+    seeds.push(new THREE.Vector3(
+      (Math.random()*2-1)*hx*0.95,
+      (Math.random()*2-1)*hy*0.95,
+      (Math.random()*2-1)*hz*0.9
+    ));
+  }
+
+  for(let i=0;i<FRAGS;i++){
+    const si = seeds[i];
+    // nearest neighbors → bisector clipping planes (true voronoi cell)
+    const others = seeds.map((s,j)=>({j,d:si.distanceToSquared(s)}))
+      .filter(o=>o.j!==i).sort((a,b)=>a.d-b.d).slice(0,NEIGHBORS);
+    const basePlanes = others.map(o=>{
+      const sj = seeds[o.j];
+      const n = si.clone().sub(sj).normalize();           // keep si side
+      const m = si.clone().add(sj).multiplyScalar(0.5);
+      return new THREE.Plane().setFromNormalAndCoplanarPoint(n, m);
+    });
+    const livePlanes = basePlanes.map(p=>p.clone());
+
+    const clone = src.clone(true);
+    clone.traverse(o=>{
+      if(o.isMesh){
+        o.material = o.material.clone();
+        o.material.side = THREE.FrontSide;   // outer skin only — lets the core show through cuts
+        o.material.clippingPlanes = livePlanes;
+        o.material.clipShadows = true;
+        o.material.roughness = .95; o.material.metalness = .02;
+      }
+    });
+    // inner core: backfaces rendered as raw concrete so cut chunks read SOLID, not hollow
+    const core = src.clone(true);
+    const coreMat = new THREE.MeshStandardMaterial({
+      color:0x57524b, roughness:1, metalness:0,
+      side:THREE.BackSide, clippingPlanes:livePlanes,
+      polygonOffset:true, polygonOffsetFactor:1, polygonOffsetUnits:1
+    });
+    core.traverse(o=>{ if(o.isMesh) o.material = coreMat; });
+    const grp = new THREE.Group();
+    grp.add(core);
+    grp.add(clone);
+    grp.userData = {
+      basePlanes, livePlanes, seed: si,
+      vel: new THREE.Vector3(), angVel: new THREE.Vector3(),
+      crackOff: new THREE.Vector3((Math.random()-0.5)*.05,(Math.random()-0.5)*.04,(Math.random()-0.5)*.05),
+      crackRot: (Math.random()-0.5)*.04,
+      fromPos: new THREE.Vector3(), fromRot: new THREE.Euler(),
+      resting:false, floorStop: floorY + 0.05 - si.y
+    };
+    root.add(grp); frags.push(grp);
+  }
+  document.getElementById('loading').classList.add('hide');
+},undefined,()=>{ document.getElementById('loading').classList.add('hide'); });
+
+function breakBolts(){
+  if(mode!=='whole' || frags.length===0) return;
+  mode='crack'; modeStart=clock.elapsedTime;
+}
+hero.addEventListener('pointerdown', breakBolts);
+
+// break when scrolling down to the next section; re-arm when back at top
+let scrollArmed = true;
+addEventListener('scroll', ()=>{
+  if(scrollArmed && window.scrollY > innerHeight*0.15){
+    scrollArmed = false;
+    breakBolts();
+  } else if(!scrollArmed && window.scrollY < innerHeight*0.06){
+    scrollArmed = true;
+  }
+},{passive:true});
+
+function startFly(){
+  mode='fly'; modeStart=clock.elapsedTime;
+  for(const g of frags){
+    const u=g.userData;
+    const radial = u.seed.clone().setY(Math.abs(u.seed.y)*0.4).normalize();
+    g.position.copy(u.crackOff);
+    u.vel.copy(radial).multiplyScalar(0.7+Math.random()*1.3);
+    u.vel.y += 0.6+Math.random()*1.1;
+    u.vel.z += (Math.random()-0.5)*0.8;
+    u.angVel.set((Math.random()-0.5)*3.2,(Math.random()-0.5)*3.2,(Math.random()-0.5)*3.2);
+    u.resting=false;
+  }
+  spawnDust();
+}
+
+function startReturn(){
+  mode='return'; modeStart=clock.elapsedTime;
+  for(const g of frags){
+    g.userData.fromPos.copy(g.position);
+    g.userData.fromRot.copy(g.rotation);
+  }
+}
+
+function spawnDust(){
+  const N=150, pos=new Float32Array(N*3), vel=[];
+  for(let i=0;i<N;i++){
+    const s=frags[(Math.random()*frags.length)|0].userData.seed;
+    pos[i*3]=s.x+(Math.random()-0.5)*.3; pos[i*3+1]=s.y+(Math.random()-0.5)*.3; pos[i*3+2]=s.z+(Math.random()-0.5)*.3;
+    vel.push(new THREE.Vector3((Math.random()-0.5)*1.6,Math.random()*1.1,(Math.random()-0.5)*1.6));
+  }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  const mat=new THREE.PointsMaterial({color:0xb9b2a4,size:.035,transparent:true,opacity:.85,depthWrite:false});
+  dust=new THREE.Points(geo,mat); dust.userData={vel,born:clock.elapsedTime};
+  root.add(dust);
+}
+
+const ease = t=>1-Math.pow(1-t,3);
+const clock = new THREE.Clock();
+let mx=0,my=0;
+addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth-.5);my=(e.clientY/innerHeight-.5);});
+function resize(){
+  const w=hero.clientWidth,h=hero.clientHeight;
+  renderer.setSize(w,h,false);
+  camera.aspect=w/h; camera.updateProjectionMatrix();
+}
+addEventListener('resize',resize); resize();
+
+renderer.setAnimationLoop(()=>{
+  const dt = Math.min(clock.getDelta(), .05);
+  const t = clock.elapsedTime;
+  root.rotation.y = Math.sin(t*0.1)*0.12 + mx*0.3;
+  root.rotation.x = my*0.1;
+
+  if(mode==='crack'){
+    const k=(t-modeStart)/0.22;
+    for(const g of frags){
+      const u=g.userData;
+      // shudder: cracks open with a shake
+      g.position.copy(u.crackOff).multiplyScalar(Math.min(k,1))
+        .add(new THREE.Vector3((Math.random()-0.5)*.012,(Math.random()-0.5)*.012,0));
+      g.rotation.z = u.crackRot*Math.min(k,1);
+    }
+    if(k>=1) startFly();
+  }
+  else if(mode==='fly'){
+    for(const g of frags){
+      const u=g.userData;
+      if(u.resting) continue;
+      u.vel.y -= GRAVITY*dt;
+      g.position.addScaledVector(u.vel,dt);
+      g.rotation.x += u.angVel.x*dt; g.rotation.y += u.angVel.y*dt; g.rotation.z += u.angVel.z*dt;
+      if(g.position.y < u.floorStop){          // concrete hits the floor
+        g.position.y = u.floorStop;
+        if(Math.abs(u.vel.y) > .6){
+          u.vel.y *= -0.28; u.vel.x *= .55; u.vel.z *= .55;
+          u.angVel.multiplyScalar(.5);
+        } else { u.vel.set(0,0,0); u.angVel.multiplyScalar(.85); u.resting=true; }
+      }
+    }
+    if(t-modeStart>3.6) startReturn();
+  }
+  else if(mode==='return'){
+    const k=ease(Math.min((t-modeStart)/1.2,1));
+    for(const g of frags){
+      const u=g.userData;
+      g.position.lerpVectors(u.fromPos, new THREE.Vector3(0,0,0), k);
+      g.rotation.set(u.fromRot.x*(1-k), u.fromRot.y*(1-k), u.fromRot.z*(1-k));
+    }
+    if(k>=1){ mode='whole'; }
+  }
+
+  // clipping planes ride along with each fragment → solid concrete chunks
+  for(const g of frags){
+    g.updateMatrixWorld();
+    const u=g.userData;
+    for(let i=0;i<u.livePlanes.length;i++){
+      u.livePlanes[i].copy(u.basePlanes[i]).applyMatrix4(g.matrixWorld);
+    }
+  }
+
+  // dust
+  if(dust){
+    const u=dust.userData, age=t-u.born;
+    const p=dust.geometry.attributes.position;
+    for(let i=0;i<u.vel.length;i++){
+      u.vel[i].y -= 2.2*dt;
+      p.array[i*3]+=u.vel[i].x*dt; p.array[i*3+1]+=u.vel[i].y*dt; p.array[i*3+2]+=u.vel[i].z*dt;
+      if(p.array[i*3+1]<floorY) p.array[i*3+1]=floorY;
+    }
+    p.needsUpdate=true;
+    dust.material.opacity=Math.max(0,.85-age*.5);
+    if(age>2.2){ root.remove(dust); dust.geometry.dispose(); dust.material.dispose(); dust=null; }
+  }
+
+  renderer.render(scene,camera);
+});
+
+// reveal on scroll
+const io = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('inview');}),{threshold:.18});
+document.querySelectorAll('.pick').forEach(el=>io.observe(el));
+
+// palm toggle
+document.getElementById('palmToggle')?.addEventListener('click', e=>{
+  e.preventDefault(); e.stopPropagation();
+  document.body.classList.toggle('no-palms');
+});
+
+// 3D mouse-tracking tilt on the jewel cases
+document.querySelectorAll('.pick').forEach(pick=>{
+  const tilt = pick.querySelector('.tilt');
+  if(!tilt) return;
+  pick.addEventListener('pointermove', e=>{
+    const r = pick.getBoundingClientRect();
+    const px = (e.clientX - r.left)/r.width - .5;
+    const py = (e.clientY - r.top)/r.height - .5;
+    tilt.style.transform = `rotateY(${px*22}deg) rotateX(${-py*16}deg)`;
+  });
+  pick.addEventListener('pointerleave', ()=>{ tilt.style.transform = 'rotateY(0) rotateX(0)'; });
+});
+</script>
+</body>
+</html>
