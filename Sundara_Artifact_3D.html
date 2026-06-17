@@ -27,7 +27,7 @@
   /* HUD — museum label */
   .hud{position:fixed;z-index:3;pointer-events:none;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--soft);}
   .tl{top:30px;left:32px;}
-  .tr{top:30px;right:32px;text-align:right;}
+  .tr{bottom:30px;right:32px;text-align:right;}
   .hud .accent{color:var(--ink);}
   .plate{position:fixed;left:50%;bottom:34px;transform:translateX(-50%);z-index:3;text-align:center;pointer-events:none;}
   .plate .logo{width:min(52vw,360px);aspect-ratio:5.347;margin:0 auto 10px;
@@ -40,8 +40,8 @@
   @keyframes sundaraSweep{to{background-position:300% 0, 0 0;}}
   .plate small{font-size:10px;letter-spacing:6px;text-transform:uppercase;color:var(--soft);}
 
-  .switch{position:fixed;top:30px;left:50%;transform:translateX(-50%);z-index:4;display:flex;gap:8px;}
-  .switch.shapes{top:64px;}
+  .switch{position:fixed;right:30px;bottom:62px;left:auto;transform:none;z-index:4;display:flex;gap:8px;justify-content:flex-end;}
+  .switch.shapes{top:auto;bottom:26px;right:30px;left:auto;transform:none;}
   .switch button{background:rgba(255,255,255,.25);border:1px solid rgba(58,58,64,.35);color:var(--ink);
     font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;
     padding:7px 13px;cursor:pointer;backdrop-filter:blur(4px);transition:.2s;}
@@ -54,11 +54,9 @@
 <body>
   <canvas id="view"></canvas>
   <canvas id="trail"></canvas>
-  <div class="hud tl">SUNDARA<br><span class="accent">ARTEFACT 001</span></div>
-  <div class="hud tr">PRISMA / OIL-SLICK<br><span class="accent">NAARM · 2026</span></div>
   <div class="plate">
     <div class="logo" role="img" aria-label="SUNDARA"></div>
-    <small>Play To Sunrise</small>
+    <small>Stay For Sunrise</small>
   </div>
   <div class="switch">
     <button id="mOil" class="on">Oil-Slick</button>
@@ -164,7 +162,7 @@
   const geoBolt=boltGeo();
   const orb=new THREE.Mesh(geoSphere,
     new THREE.ShaderMaterial({uniforms,vertexShader:vsh,fragmentShader:fsh}));
-  orb.scale.setScalar(0.82);
+  orb.scale.setScalar(0.72);
   orb.position.set(0,0.28,0);                   // slightly smaller + lifted, leaving room for the wordmark
   scene.add(orb);
   loading.style.opacity=0; setTimeout(()=>loading.remove(),600);
@@ -191,7 +189,7 @@
   const bSphere=document.getElementById('sSphere'), bCube=document.getElementById('sCube'), bBolt=document.getElementById('sBolt');
   function setShape(name){
     orb.geometry = name==='cube'?geoCube : name==='bolt'?geoBolt : geoSphere;
-    orb.scale.setScalar(name==='bolt'?0.58:0.82);                         // bolt smaller -> fits the gap
+    orb.scale.setScalar(name==='bolt'?0.50:0.72);                         // bolt smaller -> fits the gap
     if(name==='cube') orb.rotation.set(-0.5, orb.rotation.y, 0.18);       // 3 faces read
     else if(name==='bolt') orb.rotation.set(-0.12, orb.rotation.y, 0);
     else orb.rotation.set(0, orb.rotation.y, 0);
@@ -208,6 +206,7 @@
   (function loop(){
     requestAnimationFrame(loop);
     uniforms.uTime.value=clock.getElapsedTime();
+    orb.position.y=0.28+Math.sin(uniforms.uTime.value*0.9)*0.085;   // gentle float up/down
     uniforms.uHover.value+=(hoverT-uniforms.uHover.value)*0.08;
     uniforms.uMouse.value.x+=(mouse.x-uniforms.uMouse.value.x)*0.1;
     uniforms.uMouse.value.y+=(mouse.y-uniforms.uMouse.value.y)*0.1;

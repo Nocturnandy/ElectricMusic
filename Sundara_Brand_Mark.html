@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SUNDARA — Brand Mark</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+  :root{ --ink:#3a3a40; --soft:#6a6a72; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;}
+  body{font-family:'Space Mono',monospace;color:var(--ink);min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+    background:linear-gradient(180deg,#d7a0e6 0%,#e7c2ee 30%,#f1e7f1 62%,#ededed 100%);}
+  /* paper grain */
+  body::after{content:"";position:fixed;inset:0;z-index:6;pointer-events:none;mix-blend-mode:multiply;opacity:.09;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+  .wrap{position:relative;z-index:2;max-width:920px;margin:0 auto;padding:0 26px;
+    display:flex;flex-direction:column;min-height:100vh;}
+
+  /* top utility row */
+  .topbar{display:flex;justify-content:space-between;align-items:center;padding:30px 0 0;
+    font-size:11px;letter-spacing:3px;text-transform:uppercase;}
+  .topbar .mark{display:flex;align-items:center;gap:9px;}
+  .sq{width:8px;height:8px;background:var(--ink);display:inline-block;}
+  .bolts{display:flex;gap:3px;}
+  .bolts svg{width:13px;height:18px;display:block;}
+
+  /* hero — transparent oil-slick orb (Higgsfield cutout, no backdrop) */
+  .hero{flex:1;display:flex;align-items:center;justify-content:center;padding:26px 0 6px;}
+  .orb{width:min(74vw,540px);aspect-ratio:1;
+    background:center/contain no-repeat
+      url("https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260617_052553_ba8e7781-c56f-49cf-8b06-3efaddf0d2a8.png");
+    filter:drop-shadow(0 26px 60px rgba(40,10,55,.32));}
+
+  /* wordmark — muted-Pantone sweep multiplied over grey */
+  .wordmark{text-align:center;margin:2px 0 2px;}
+  .wordmark .logo{width:min(82vw,640px);aspect-ratio:5.347;margin:0 auto;
+    background:linear-gradient(90deg,#b46a8e,#b08a5c,#5f9a7c,#5f7ba6,#7d6aa0,#b46a8e),#5a575f;
+    background-size:300% 100%,100% 100%;background-blend-mode:multiply;
+    animation:sundaraSweep 11s linear infinite;
+    -webkit-mask:url("Web Assets/sundara_wordmark.png") center/contain no-repeat;
+    mask:url("Web Assets/sundara_wordmark.png") center/contain no-repeat;}
+  @keyframes sundaraSweep{to{background-position:300% 0, 0 0;}}
+
+  .tags{display:flex;justify-content:center;gap:14px;margin:14px 0 8px;
+    font-size:11px;letter-spacing:5px;text-transform:uppercase;color:var(--soft);}
+  .tags b{color:var(--ink);font-weight:700;}
+
+  /* footer */
+  .foot{display:flex;justify-content:space-between;align-items:center;
+    padding:14px 0 28px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--soft);}
+  .foot .mark{display:flex;align-items:center;gap:9px;color:var(--ink);}
+
+  @media(max-width:560px){
+    .topbar{font-size:9px;letter-spacing:2px;}
+    .foot{font-size:9px;letter-spacing:2px;}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+
+    <div class="topbar">
+      <div class="mark"><span class="sq"></span>ELECTRIC</div>
+      <div class="bolts">
+        <svg viewBox="0 0 24 34"><path d="M14 1 4 19h6l-3 14L21 12h-6l3-11z" fill="currentColor"/></svg>
+        <svg viewBox="0 0 24 34"><path d="M14 1 4 19h6l-3 14L21 12h-6l3-11z" fill="currentColor"/></svg>
+        <svg viewBox="0 0 24 34"><path d="M14 1 4 19h6l-3 14L21 12h-6l3-11z" fill="currentColor"/></svg>
+      </div>
+      <div class="mark">ARTEFACT 001<span class="sq"></span></div>
+    </div>
+
+    <div class="hero">
+      <div class="orb" role="img" aria-label="Sundara oil-slick orb"></div>
+    </div>
+
+    <div class="wordmark">
+      <div class="logo" role="img" aria-label="SUNDARA"></div>
+    </div>
+
+    <div class="tags"><b>STAY FOR SUNRISE</b></div>
+
+    <div class="foot">
+      <div class="mark"><span class="sq"></span>NAARM · 2026</div>
+      <div class="mark">AN ELECTRIC LABEL<span class="sq"></span></div>
+    </div>
+
+  </div>
+</body>
+</html>
