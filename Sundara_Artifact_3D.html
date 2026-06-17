@@ -200,7 +200,7 @@
   bBolt.addEventListener('click',()=>setShape('bolt'));
 
   let frameMul=1;
-  function size(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;frameMul=camera.aspect<1?Math.min(1/camera.aspect,2.3):1;camera.updateProjectionMatrix();}
+  function size(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;frameMul=camera.aspect<1?Math.min(1/camera.aspect*1.35,3.4):1;camera.updateProjectionMatrix();}
   size(); addEventListener('resize',size);
 
   const clock=new THREE.Clock();

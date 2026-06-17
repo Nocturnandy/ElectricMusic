@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SUNDARA — Orb Lockup</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+  :root{ --ink:#3a3a40; --soft:#6a6a72; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;}
+  body{font-family:'Space Mono',monospace;color:var(--ink);min-height:100vh;
+    -webkit-font-smoothing:antialiased;display:flex;flex-direction:column;
+    background:linear-gradient(180deg,#d7a0e6 0%,#e7c2ee 30%,#f1e7f1 62%,#ededed 100%);}
+  body::after{content:"";position:fixed;inset:0;z-index:6;pointer-events:none;mix-blend-mode:multiply;opacity:.09;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+  .stage{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+
+  /* the lockup = orb with the wordmark sitting over it */
+  .lockup{position:relative;width:min(78vw,560px);aspect-ratio:1;}
+  .lockup .orb{position:absolute;inset:0;
+    background:center/contain no-repeat
+      url("https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260617_052553_ba8e7781-c56f-49cf-8b06-3efaddf0d2a8.png");
+    filter:drop-shadow(0 24px 56px rgba(40,10,55,.34));}
+  /* wordmark sits across the lower belly of the sphere */
+  .lockup .logo{position:absolute;left:50%;top:60%;transform:translate(-50%,-50%);
+    width:74%;aspect-ratio:5.347;
+    -webkit-mask:url("Web Assets/sundara_wordmark.png") center/contain no-repeat;
+    mask:url("Web Assets/sundara_wordmark.png") center/contain no-repeat;}
+
+  /* — fills — */
+  .grey .logo{background:#d9d4dc;}                 /* light grey reads on the dark sphere */
+  .gradient .logo{
+    background:linear-gradient(90deg,#f3c7e0,#f0d3a8,#a9e7c8,#a9c6ef,#cdb9ec,#f3c7e0);
+    background-size:300% 100%;animation:sweep 11s linear infinite;}
+  @keyframes sweep{to{background-position:300% 0;}}
+
+  .controls{display:flex;justify-content:center;gap:10px;padding:0 0 40px;}
+  .controls button{background:rgba(255,255,255,.35);border:1px solid rgba(58,58,64,.35);color:var(--ink);
+    font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;
+    padding:9px 16px;cursor:pointer;backdrop-filter:blur(4px);transition:.2s;}
+  .controls button:hover{border-color:var(--ink);}
+  .controls button.on{background:var(--ink);color:#f1e7f1;border-color:var(--ink);}
+
+  .cap{text-align:center;font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--soft);padding:0 0 14px;}
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="lockup grey" id="lockup">
+      <div class="orb" role="img" aria-label="Sundara oil-slick orb"></div>
+      <div class="logo" role="img" aria-label="SUNDARA"></div>
+    </div>
+  </div>
+  <div class="cap">STAY FOR SUNRISE · MELBOURNE</div>
+  <div class="controls">
+    <button id="bGrey" class="on">Grey</button>
+    <button id="bGrad">Gradient Tint</button>
+  </div>
+
+<script>
+  const lk=document.getElementById('lockup');
+  const bGrey=document.getElementById('bGrey'), bGrad=document.getElementById('bGrad');
+  bGrey.addEventListener('click',()=>{lk.classList.add('grey');lk.classList.remove('gradient');bGrey.classList.add('on');bGrad.classList.remove('on');});
+  bGrad.addEventListener('click',()=>{lk.classList.add('gradient');lk.classList.remove('grey');bGrad.classList.add('on');bGrey.classList.remove('on');});
+</script>
+</body>
+</html>
