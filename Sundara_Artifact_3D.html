@@ -49,6 +49,12 @@
   .switch button.on{background:var(--ink);color:#f1e7f1;border-color:var(--ink);}
   .loading{position:fixed;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;
     font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--soft);transition:opacity .6s;}
+  /* phone: shrink controls to top so they don't cover the wordmark/logo */
+  @media(max-width:760px){
+    .switch{right:auto;left:50%;transform:translateX(-50%);bottom:auto;top:66px;justify-content:center;}
+    .switch.shapes{right:auto;left:50%;transform:translateX(-50%);bottom:auto;top:104px;}
+    .switch button{padding:6px 10px;font-size:8px;letter-spacing:2px;}
+  }
 </style>
 </head>
 <body>
@@ -187,9 +193,10 @@
   bBlack.addEventListener('click',()=>{modeT=1;bBlack.classList.add('on');bOil.classList.remove('on');});
 
   const bSphere=document.getElementById('sSphere'), bCube=document.getElementById('sCube'), bBolt=document.getElementById('sBolt');
+  let frameMul=1, baseScale=0.72, portrait=false;
   function setShape(name){
     orb.geometry = name==='cube'?geoCube : name==='bolt'?geoBolt : geoSphere;
-    orb.scale.setScalar(name==='bolt'?0.50:0.72);                         // bolt smaller -> fits the gap
+    baseScale = name==='bolt'?0.50:0.72;                                  // bolt smaller -> fits the gap
     if(name==='cube') orb.rotation.set(-0.5, orb.rotation.y, 0.18);       // 3 faces read
     else if(name==='bolt') orb.rotation.set(-0.12, orb.rotation.y, 0);
     else orb.rotation.set(0, orb.rotation.y, 0);
@@ -199,8 +206,7 @@
   bCube.addEventListener('click',()=>setShape('cube'));
   bBolt.addEventListener('click',()=>setShape('bolt'));
 
-  let frameMul=1;
-  function size(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;frameMul=camera.aspect<1?Math.min(1/camera.aspect*1.35,3.4):1;camera.updateProjectionMatrix();}
+  function size(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;portrait=camera.aspect<1;frameMul=portrait?Math.min(1/camera.aspect,1.7):1;camera.updateProjectionMatrix();}
   size(); addEventListener('resize',size);
 
   const clock=new THREE.Clock();
@@ -208,6 +214,7 @@
     requestAnimationFrame(loop);
     uniforms.uTime.value=clock.getElapsedTime();
     orb.position.y=0.28+Math.sin(uniforms.uTime.value*0.9)*0.085;   // gentle float up/down
+    orb.scale.setScalar(baseScale*(portrait?0.58:1));               // much smaller on phone
     uniforms.uHover.value+=(hoverT-uniforms.uHover.value)*0.08;
     uniforms.uMouse.value.x+=(mouse.x-uniforms.uMouse.value.x)*0.1;
     uniforms.uMouse.value.y+=(mouse.y-uniforms.uMouse.value.y)*0.1;
