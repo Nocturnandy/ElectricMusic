@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SUNDARA — Interactive Sundial (Option)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap');
+  :root{--cream:#EEE5CF;--sand:#F2E7C9;--orange:#FC7218;--gold:#E9A23B;--rust:#C2451C;--brown:#6E3F22;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;}
+  body{font-family:'Space Mono',monospace;color:var(--brown);overflow:hidden;
+    background:radial-gradient(ellipse 90% 90% at 50% 18%, #FBEBC9 0%, #F1DEB4 45%, #E9CF9E 100%);
+    display:flex;align-items:center;justify-content:center;}
+  body::after{content:'';position:fixed;inset:0;pointer-events:none;opacity:.05;z-index:9;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+  .wrap{position:relative;width:min(86vmin,720px);aspect-ratio:1;}
+  svg{width:100%;height:100%;display:block;cursor:crosshair;touch-action:none;}
+  .badge{transition:transform .35s cubic-bezier(.2,.8,.25,1),filter .35s;transform-origin:center;}
+  .icon.active .badge{transform:scale(1.18);filter:drop-shadow(0 6px 16px rgba(194,69,28,.45));}
+  .ring-num{font-size:11px;letter-spacing:3px;fill:var(--brown);opacity:.4;text-transform:uppercase;}
+  .center-phase{font-family:'Bebas Neue',sans-serif;letter-spacing:.12em;fill:var(--orange);}
+  .center-time{font-family:'Space Mono';fill:var(--brown);opacity:.7;}
+  .center-sub{font-family:'Space Mono';fill:var(--brown);opacity:.45;letter-spacing:3px;}
+  .hint{position:absolute;left:50%;bottom:-2.4em;transform:translateX(-50%);font-size:10px;letter-spacing:4px;
+    text-transform:uppercase;opacity:.45;white-space:nowrap;}
+  #gnomon{transition:transform .12s linear;}
+  .brand{position:fixed;top:26px;left:50%;transform:translateX(-50%);font-family:'Bebas Neue',sans-serif;
+    font-size:26px;letter-spacing:.4em;color:var(--orange);}
+  .brand small{display:block;text-align:center;font-family:'Space Mono';font-size:9px;letter-spacing:5px;color:var(--brown);opacity:.55;margin-top:4px;}
+</style>
+</head>
+<body>
+  <div class="brand">SUNDARA<small>Stay For Sunrise</small></div>
+  <div class="wrap">
+    <svg viewBox="0 0 600 600" id="dial" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="hint">Move to spin the day · it rests on the hour</div>
+  </div>
+
+<script>
+  const C=300, R_ICON=232, R_RING=262;
+  const OR='#FC7218', GOLD='#E9A23B', RUST='#C2451C', BROWN='#6E3F22', SAND='#F2E7C9', CREAM='#EEE5CF';
+  const NS='http://www.w3.org/2000/svg';
+
+  /* six icons, clockwise from top, mapped to a day cycle */
+  const PHASES=[
+    {key:'sun',   label:'Sunrise',     sub:'06 — 10'},
+    {key:'palm',  label:'Daytime',     sub:'10 — 14'},
+    {key:'cocktail',label:'Golden Hour',sub:'14 — 18'},
+    {key:'wave',  label:'Sunset',      sub:'18 — 22'},
+    {key:'moon',  label:'Midnight',    sub:'22 — 02'},
+    {key:'bolt',  label:'After Dark',  sub:'02 — 06'},
+  ];
+
+  /* ── icon artwork (warm bauhaus), drawn centred at 0,0 ── */
+  const ICON={
+    sun(){let r='';for(let i=0;i<12;i++){const a=i/12*6.283;r+=`<line x1="${Math.cos(a)*19}" y1="${Math.sin(a)*19}" x2="${Math.cos(a)*27}" y2="${Math.sin(a)*27}" stroke="${GOLD}" stroke-width="3" stroke-linecap="round"/>`;}
+      return r+`<circle r="15" fill="${OR}"/>`;},
+    palm(){let f='';[[-90,30],[-58,30],[-122,30],[-28,25],[-152,25]].forEach(([d,l])=>{const a=d*Math.PI/180,ex=Math.cos(a)*l,ey=Math.sin(a)*l,bx=Math.cos(a)*l*0.5,by=Math.sin(a)*l*0.5-6;f+=`<path d="M0 -4 Q ${bx} ${by} ${ex} ${ey}" stroke="${OR}" stroke-width="4.5" fill="none" stroke-linecap="round"/>`;});
+      return `<path d="M0 30 Q -5 10 0 -4" stroke="${BROWN}" stroke-width="5.5" fill="none" stroke-linecap="round"/>${f}<circle cx="-4" cy="0" r="2.6" fill="${RUST}"/><circle cx="4" cy="0" r="2.6" fill="${RUST}"/>`;},
+    cocktail(){return `<path d="M-17 -15 L17 -15 L0 5 Z" fill="${OR}"/><line x1="-13" y1="-11" x2="13" y2="-11" stroke="${RUST}" stroke-width="2.4"/><path d="M0 5 L0 24" stroke="${BROWN}" stroke-width="3.4" stroke-linecap="round"/><path d="M-12 24 L12 24" stroke="${BROWN}" stroke-width="3.4" stroke-linecap="round"/><circle cx="14" cy="-15" r="4.5" fill="${GOLD}"/><line x1="14" y1="-15" x2="9" y2="-26" stroke="${GOLD}" stroke-width="2"/>`;},
+    wave(){const row=(y,col)=>{let s='';for(let x=-26;x<28;x+=12){s+=`<path d="M${x} ${y} a6 6 0 0 1 12 0" fill="${col}"/>`;}return s;};
+      return row(2,GOLD)+row(11,OR)+row(20,RUST);},
+    moon(){return `<circle r="17" fill="${GOLD}"/><circle cx="7" cy="-4" r="14.5" fill="${SAND}"/><path d="M-22 -16 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 z" fill="${OR}"/>`;},
+    bolt(){return `<path d="M4 -22 L-10 5 L-1 5 L-6 23 L11 -3 L2 -3 L6 -22 Z" fill="${OR}"/><path d="M3 -14 L-5 4 L1 4 L-2 16 L7 -1 L1 -1 L4 -14 Z" fill="${GOLD}"/>`;},
+  };
+
+  const svg=document.getElementById('dial');
+  function el(tag,attrs,inner){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(inner!=null)e.innerHTML=inner;return e;}
+
+  /* outer rings + ticks */
+  svg.appendChild(el('circle',{cx:C,cy:C,r:284,fill:'none',stroke:BROWN,'stroke-width':2,opacity:.25}));
+  svg.appendChild(el('circle',{cx:C,cy:C,r:R_RING,fill:'none',stroke:BROWN,'stroke-width':1.2,opacity:.18}));
+  svg.appendChild(el('circle',{cx:C,cy:C,r:200,fill:'none',stroke:BROWN,'stroke-width':1.2,opacity:.12}));
+  let ticks='';
+  for(let i=0;i<72;i++){const a=i/72*6.283-Math.PI/2;const big=i%12===0;const r1=big?270:276,r2=284;
+    ticks+=`<line x1="${C+Math.cos(a)*r1}" y1="${C+Math.sin(a)*r1}" x2="${C+Math.cos(a)*r2}" y2="${C+Math.sin(a)*r2}" stroke="${BROWN}" stroke-width="${big?2.4:1}" opacity="${big?.4:.2}"/>`;}
+  svg.appendChild(el('g',{},ticks));
+
+  /* icon badges */
+  const iconEls=[];
+  PHASES.forEach((p,i)=>{
+    const a=(-90+i*60)*Math.PI/180, x=C+Math.cos(a)*R_ICON, y=C+Math.sin(a)*R_ICON;
+    const g=el('g',{class:'icon','data-i':i,transform:`translate(${x},${y})`});
+    g.appendChild(el('circle',{class:'badge',r:46,fill:SAND,stroke:BROWN,'stroke-width':1.5,'stroke-opacity':.25}));
+    g.appendChild(el('g',{},ICON[p.key]()));
+    svg.appendChild(g); iconEls.push(g);
+  });
+
+  /* gnomon (rotating hand) + hub */
+  const hand=el('g',{id:'gnomon'});
+  hand.appendChild(el('path',{d:`M${C} ${C-208} L${C-9} ${C} L${C+9} ${C} Z`,fill:OR,opacity:.92}));
+  hand.appendChild(el('circle',{cx:C,cy:C-208,r:13,fill:GOLD,stroke:OR,'stroke-width':3}));   /* sun bead at tip */
+  hand.appendChild(el('path',{d:`M${C} ${C+44} L${C-5} ${C} L${C+5} ${C} Z`,fill:BROWN,opacity:.5})); /* counterweight */
+  svg.appendChild(hand);
+  svg.appendChild(el('circle',{cx:C,cy:C,r:30,fill:CREAM,stroke:BROWN,'stroke-width':2,'stroke-opacity':.4}));
+  svg.appendChild(el('circle',{cx:C,cy:C,r:7,fill:OR}));
+
+  /* centre readout */
+  const tPhase=el('text',{x:C,y:C-72,'text-anchor':'middle','font-size':30,class:'center-phase'});
+  const tTime =el('text',{x:C,y:C+90,'text-anchor':'middle','font-size':22,class:'center-time'});
+  const tSub  =el('text',{x:C,y:C+112,'text-anchor':'middle','font-size':10,class:'center-sub'});
+  svg.appendChild(tPhase);svg.appendChild(tTime);svg.appendChild(tSub);
+
+  /* ── interaction ── */
+  let targetDeg=0, curDeg=0, userActive=false, idleTimer=0;
+  function timeDeg(){const d=new Date();const h=d.getHours()+d.getMinutes()/60;return ((h-6+24)%24)/24*360;}
+  function clockStr(){const d=new Date();return d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});}
+
+  function setActive(deg){
+    const idx=((Math.round(deg/60)%6)+6)%6;
+    iconEls.forEach((g,i)=>g.classList.toggle('active',i===idx));
+    tPhase.textContent=PHASES[idx].label;
+    tTime.textContent=clockStr();
+    tSub.textContent='SUNDARA TIME';
+  }
+
+  svg.addEventListener('pointermove',e=>{
+    const r=svg.getBoundingClientRect();
+    const mx=(e.clientX-r.left)/r.width*600, my=(e.clientY-r.top)/r.height*600;
+    let a=Math.atan2(my-C,mx-C)*180/Math.PI+90;            // 0 = up, clockwise
+    targetDeg=(a+360)%360; userActive=true; idleTimer=0;
+  });
+  svg.addEventListener('pointerleave',()=>{userActive=false;});
+
+  targetDeg=curDeg=timeDeg();
+  (function tick(){
+    requestAnimationFrame(tick);
+    if(!userActive){ idleTimer++; if(idleTimer>40) targetDeg=timeDeg(); }
+    // shortest-path ease toward target
+    let diff=((targetDeg-curDeg+540)%360)-180;
+    curDeg+=diff*(userActive?0.25:0.04);
+    const cd=(curDeg+360)%360;
+    hand.setAttribute('transform',`rotate(${cd} ${C} ${C})`);
+    setActive(cd);
+  })();
+</script>
+</body>
+</html>

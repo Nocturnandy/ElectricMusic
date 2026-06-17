@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SUNDARA — 3D Sundial</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;overflow:hidden;}
+  body{font-family:'Space Mono',monospace;color:#6E3F22;
+    background:radial-gradient(ellipse 100% 90% at 50% 14%, #FBEBC9 0%, #F1DEB4 45%, #E7C892 100%);}
+  canvas{display:block;cursor:grab;}
+  canvas:active{cursor:grabbing;}
+  .brand{position:fixed;top:24px;left:50%;transform:translateX(-50%);text-align:center;z-index:3;pointer-events:none;}
+  .brand b{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.42em;color:#FC7218;}
+  .brand small{display:block;font-size:9px;letter-spacing:5px;color:#6E3F22;opacity:.55;margin-top:4px;}
+  .readout{position:fixed;bottom:7%;left:50%;transform:translateX(-50%);text-align:center;z-index:3;pointer-events:none;}
+  .readout .phase{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,46px);letter-spacing:.1em;color:#FC7218;line-height:1;}
+  .readout .time{font-size:14px;letter-spacing:3px;opacity:.7;margin-top:6px;}
+  .hint{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:4px;text-transform:uppercase;opacity:.4;z-index:3;pointer-events:none;white-space:nowrap;}
+</style>
+</head>
+<body>
+  <div class="brand"><b>SUNDARA</b><small>Stay For Sunrise</small></div>
+  <div class="readout"><div class="phase" id="phase">Sunrise</div><div class="time" id="time">06:00</div></div>
+  <div class="hint">Drag to orbit · move to sweep the sun · it rests on the hour</div>
+  <canvas id="c"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  if(!window.THREE)return;
+  const CREAM='#EFE2C4', SAND='#E7D5AC', OR='#FC7218', GOLD='#E9A23B', RUST='#C2451C', BROWN='#6E3F22';
+  const FULL=384;
+  /* ── icon textures (vector now, Higgsfield swapped in on load) ── */
+  function star(c,X,Y,r){c.beginPath();for(let i=0;i<10;i++){const a=i/10*Math.PI*2-Math.PI/2,rr=i%2?r*0.42:r;c.lineTo(X+Math.cos(a)*rr,Y+Math.sin(a)*rr);}c.closePath();c.fill();}
+  function poly(c,F,pts,col){c.fillStyle=col;c.beginPath();pts.forEach((p,i)=>{const X=p[0]*F,Y=p[1]*F;i?c.lineTo(X,Y):c.moveTo(X,Y);});c.closePath();c.fill();}
+  const ICANVAS={}, ITEX={};
+  function makeIcon(name,fn){const cv=document.createElement('canvas');cv.width=cv.height=FULL;const x=cv.getContext('2d');x.fillStyle=SAND;x.fillRect(0,0,FULL,FULL);x.lineJoin='round';fn(x,FULL);ICANVAS[name]=cv;const t=new THREE.CanvasTexture(cv);t.anisotropy=8;ITEX[name]=t;}
+  makeIcon('sun',(c,F)=>{const m=F/2;c.strokeStyle=GOLD;c.lineWidth=F*0.024;c.lineCap='round';for(let i=0;i<16;i++){const a=i/16*6.283;c.beginPath();c.moveTo(m+Math.cos(a)*F*0.32,m+Math.sin(a)*F*0.32);c.lineTo(m+Math.cos(a)*F*0.46,m+Math.sin(a)*F*0.46);c.stroke();}c.fillStyle=OR;c.beginPath();c.arc(m,m,F*0.24,0,7);c.fill();});
+  makeIcon('moon',(c,F)=>{c.fillStyle=GOLD;c.beginPath();c.arc(F*0.52,F*0.5,F*0.3,0,7);c.fill();c.fillStyle=SAND;c.beginPath();c.arc(F*0.66,F*0.42,F*0.27,0,7);c.fill();c.fillStyle=OR;star(c,F*0.3,F*0.28,F*0.055);});
+  makeIcon('wave',(c,F)=>{const w=(yc,r,col)=>{c.fillStyle=col;let x=-r;while(x<F+r){c.beginPath();c.arc(x+r,yc,r,Math.PI,0);c.fill();x+=2*r;}};w(F*0.5,F*0.15,GOLD);w(F*0.67,F*0.15,OR);w(F*0.84,F*0.15,RUST);});
+  makeIcon('palm',(c,F)=>{c.fillStyle=GOLD;c.fillRect(0,F*0.88,F,F*0.12);const cx=F*0.5,cy=F*0.42;c.lineCap='round';c.strokeStyle=BROWN;c.lineWidth=F*0.055;c.beginPath();c.moveTo(F*0.5,F*0.9);c.quadraticCurveTo(F*0.45,F*0.62,cx,cy);c.stroke();c.strokeStyle=OR;c.lineWidth=F*0.046;const fr=(d,l)=>{const a=d*Math.PI/180,ex=cx+Math.cos(a)*F*l,ey=cy+Math.sin(a)*F*l,bx=cx+Math.cos(a)*F*l*0.5,by=cy+Math.sin(a)*F*l*0.5-F*0.05;c.beginPath();c.moveTo(cx,cy);c.quadraticCurveTo(bx,by,ex,ey);c.stroke();};[[-90,.30],[-58,.30],[-122,.30],[-28,.26],[-152,.26]].forEach(f=>fr(f[0],f[1]));c.fillStyle=RUST;[-0.045,0.045].forEach(dx=>{c.beginPath();c.arc(cx+F*dx,cy+F*0.05,F*0.024,0,7);c.fill();});});
+  makeIcon('bolt',(c,F)=>{poly(c,F,[[.56,.10],[.32,.55],[.46,.55],[.40,.90],[.70,.42],[.55,.42],[.62,.10]],OR);poly(c,F,[[.55,.22],[.40,.52],[.50,.52],[.46,.76],[.62,.46],[.52,.46],[.57,.22]],GOLD);});
+  makeIcon('cocktail',(c,F)=>{poly(c,F,[[.3,.3],[.7,.3],[.5,.56]],OR);c.strokeStyle=BROWN;c.lineWidth=F*0.032;c.lineCap='round';c.beginPath();c.moveTo(F*0.5,F*0.56);c.lineTo(F*0.5,F*0.8);c.stroke();c.beginPath();c.moveTo(F*0.38,F*0.8);c.lineTo(F*0.62,F*0.8);c.stroke();c.fillStyle=GOLD;c.beginPath();c.arc(F*0.66,F*0.3,F*0.045,0,7);c.fill();});
+  const ICON_URLS={
+    sun:'https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260617_004134_fc344e03-e851-4d21-b7fa-cba4b8bd1be9.png',
+    moon:'https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260617_004136_0a01ce48-483f-4e38-8042-755b7e139d83.png',
+    wave:'https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260617_004138_2a7f0e3c-cf0c-473b-9fe8-782456113d4a.png',
+    palm:'https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260617_004202_0bf7af09-fa8c-4116-bac3-6ddcbbc0e9a9.png',
+    cocktail:'https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260617_004204_0bf1adfc-62ae-4833-aa69-40d97fcf247a.png',
+    bolt:'https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260617_004205_80b47f79-4c15-4b70-8c54-4a6d3e5487cf.png'};
+  Object.keys(ICON_URLS).forEach(name=>{const img=new Image();img.crossOrigin='anonymous';img.onload=()=>{try{const x=ICANVAS[name].getContext('2d');x.clearRect(0,0,FULL,FULL);x.drawImage(img,0,0,FULL,FULL);x.getImageData(0,0,1,1);ITEX[name].needsUpdate=true;}catch(e){}};img.src=ICON_URLS[name];});
+
+  /* ── dial face texture (rings + ticks) ── */
+  function dialFace(){const S=1024,cv=document.createElement('canvas');cv.width=cv.height=S;const c=cv.getContext('2d');const m=S/2;
+    c.fillStyle=CREAM;c.beginPath();c.arc(m,m,m,0,7);c.fill();
+    c.strokeStyle=BROWN;c.globalAlpha=.18;c.lineWidth=3;[0.95,0.7,0.42].forEach(r=>{c.beginPath();c.arc(m,m,m*r,0,7);c.stroke();});
+    c.globalAlpha=.32;for(let i=0;i<72;i++){const a=i/72*6.283,big=i%12===0,r1=big?0.82:0.88;c.lineWidth=big?5:2;c.beginPath();c.moveTo(m+Math.cos(a)*m*r1,m+Math.sin(a)*m*r1);c.lineTo(m+Math.cos(a)*m*0.93,m+Math.sin(a)*m*0.93);c.stroke();}
+    c.globalAlpha=1;const t=new THREE.CanvasTexture(cv);t.anisotropy=8;return t;}
+
+  /* ── scene ── */
+  const canvas=document.getElementById('c');
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setClearColor(0x000000,0);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(40,1,0.1,100);
+  let camAz=-0.5, camEl=0.86, camR=9.2;        // orbit rig
+  function placeCam(){camera.position.set(camR*Math.cos(camEl)*Math.cos(camAz),camR*Math.sin(camEl),camR*Math.cos(camEl)*Math.sin(camAz));camera.lookAt(0,0.2,0);}
+  scene.add(new THREE.HemisphereLight(0xfff3da,0xb08f5a,0.85));
+  scene.add(new THREE.AmbientLight(0xffffff,0.25));
+  const sun=new THREE.DirectionalLight(0xfff0d0,1.15);sun.castShadow=true;
+  sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.near=1;sun.shadow.camera.far=30;
+  sun.shadow.camera.left=-5;sun.shadow.camera.right=5;sun.shadow.camera.top=5;sun.shadow.camera.bottom=-5;sun.shadow.bias=-0.0008;
+  scene.add(sun);scene.add(sun.target);
+  const sunOrb=new THREE.Mesh(new THREE.SphereGeometry(0.34,24,24),new THREE.MeshBasicMaterial({color:0xFFB23E}));
+  scene.add(sunOrb);
+
+  /* dial disc */
+  const DR=3.1;
+  const dial=new THREE.Mesh(new THREE.CylinderGeometry(DR,DR,0.34,72),[
+    new THREE.MeshStandardMaterial({color:0xE3CF9F,roughness:.85}),  /* rim */
+    new THREE.MeshStandardMaterial({map:dialFace(),roughness:.8}),    /* top */
+    new THREE.MeshStandardMaterial({color:0xD8C089,roughness:.85}),   /* bottom */
+  ]);
+  dial.position.y=-0.17;dial.receiveShadow=true;scene.add(dial);
+  /* rim ring */
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(DR,0.06,16,80),new THREE.MeshStandardMaterial({color:0xC2451C,roughness:.6,metalness:.1}));
+  ring.rotation.x=Math.PI/2;ring.position.y=0.02;scene.add(ring);
+
+  /* six icon badges around the dial */
+  const PHASES=[
+    {key:'sun',label:'Sunrise'},{key:'palm',label:'Daytime'},{key:'cocktail',label:'Golden Hour'},
+    {key:'wave',label:'Sunset'},{key:'moon',label:'Midnight'},{key:'bolt',label:'After Dark'}];
+  const R_ICON=2.16, badges=[];
+  PHASES.forEach((p,i)=>{
+    const phi=i/6*Math.PI*2;                       /* 0 = +x, ccw */
+    const x=Math.cos(phi)*R_ICON, z=Math.sin(phi)*R_ICON;
+    const g=new THREE.Group();g.position.set(x,0.02,z);
+    const disc=new THREE.Mesh(new THREE.CircleGeometry(0.52,40),new THREE.MeshStandardMaterial({map:ITEX[p.key],roughness:.7}));
+    disc.rotation.x=-Math.PI/2;disc.position.y=0.005;disc.receiveShadow=true;g.add(disc);
+    const rim=new THREE.Mesh(new THREE.TorusGeometry(0.54,0.03,12,40),new THREE.MeshStandardMaterial({color:0x6E3F22,roughness:.7}));
+    rim.rotation.x=Math.PI/2;g.add(rim);
+    g.userData={phi,base:1};scene.add(g);badges.push(g);
+  });
+
+  /* gnomon — tapered pin at the centre (casts the time shadow) */
+  const gn=new THREE.Mesh(new THREE.ConeGeometry(0.16,2.0,5),new THREE.MeshStandardMaterial({color:0xC85A22,roughness:.5,metalness:.15}));
+  gn.position.y=1.0;gn.castShadow=true;scene.add(gn);
+  const hub=new THREE.Mesh(new THREE.CylinderGeometry(0.34,0.34,0.12,32),new THREE.MeshStandardMaterial({color:0xE9A23B,roughness:.6}));
+  hub.position.y=0.05;hub.castShadow=true;scene.add(hub);
+
+  /* ── interaction ── */
+  let targetSA=0, curSA=0, userSun=false, idle=0, dragging=false, px=0,py=0;
+  function timeSA(){const d=new Date();const h=d.getHours()+d.getMinutes()/60;return ((h-6+24)%24)/24*Math.PI*2;}
+  function clockStr(){const d=new Date();return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+  const phaseEl=document.getElementById('phase'), timeEl=document.getElementById('time');
+
+  canvas.addEventListener('pointerdown',e=>{dragging=true;px=e.clientX;py=e.clientY;canvas.setPointerCapture(e.pointerId);});
+  canvas.addEventListener('pointerup',()=>{dragging=false;});
+  canvas.addEventListener('pointermove',e=>{
+    if(dragging){camAz-=(e.clientX-px)*0.006;camEl=Math.max(0.18,Math.min(1.35,camEl-(e.clientY-py)*0.005));px=e.clientX;py=e.clientY;}
+    else{const r=canvas.getBoundingClientRect();const nx=(e.clientX-r.left)/r.width-0.5,ny=(e.clientY-r.top)/r.height-0.5;targetSA=Math.atan2(ny,nx);userSun=true;idle=0;}
+  });
+  canvas.addEventListener('pointerleave',()=>{userSun=false;dragging=false;});
+
+  function size(){const w=innerWidth,h=innerHeight;renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+  size();addEventListener('resize',size);
+  targetSA=curSA=timeSA();
+
+  (function loop(){requestAnimationFrame(loop);
+    if(!userSun){idle++;if(idle>40)targetSA=timeSA();}
+    let d=((targetSA-curSA+Math.PI*3)%(Math.PI*2))-Math.PI;curSA+=d*(userSun?0.2:0.04);
+    /* sun position: high, orbiting; shadow points opposite → to the hour icon */
+    const sa=curSA;
+    sun.position.set(Math.cos(sa+Math.PI)*7,6.2,Math.sin(sa+Math.PI)*7);
+    sunOrb.position.copy(sun.position).multiplyScalar(0.62);sunOrb.position.y=Math.max(2.4,sunOrb.position.y);
+    sun.target.position.set(0,0,0);
+    /* highlight icon nearest the shadow direction (= curSA) */
+    let best=0,bd=9;
+    badges.forEach((g,i)=>{let diff=Math.abs(((g.userData.phi-sa+Math.PI*3)%(Math.PI*2))-Math.PI);if(diff<bd){bd=diff;best=i;}});
+    badges.forEach((g,i)=>{const want=i===best?1.28:1;g.userData.base+=(want-g.userData.base)*0.15;g.scale.setScalar(g.userData.base);g.position.y=0.02+(g.userData.base-1)*0.34;});
+    phaseEl.textContent=PHASES[best].label;timeEl.textContent=clockStr();
+    gn.rotation.y=-sa;hub.rotation.y=-sa;
+    placeCam();
+    renderer.render(scene,camera);
+  })();
+})();
+</script>
+</body>
+</html>
