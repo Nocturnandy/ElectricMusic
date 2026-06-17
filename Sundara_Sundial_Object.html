@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SUNDARA — 3D Sundial Object</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;overflow:hidden;}
+  body{font-family:'Space Mono',monospace;color:#6E3F22;
+    background:radial-gradient(ellipse 100% 90% at 50% 16%, #FBEBC9 0%, #F1DEB4 45%, #E7C892 100%);}
+  canvas{display:block;cursor:grab;}
+  canvas:active{cursor:grabbing;}
+  .brand{position:fixed;top:24px;left:50%;transform:translateX(-50%);text-align:center;z-index:3;pointer-events:none;}
+  .brand b{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.42em;color:#FC7218;}
+  .brand small{display:block;font-size:9px;letter-spacing:5px;color:#6E3F22;opacity:.55;margin-top:4px;}
+  .hint{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:4px;text-transform:uppercase;opacity:.45;z-index:3;pointer-events:none;}
+  .loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;letter-spacing:5px;text-transform:uppercase;opacity:.6;}
+  .loading.hide{opacity:0;pointer-events:none;transition:opacity .6s;}
+</style>
+</head>
+<body>
+  <div class="brand"><b>SUNDARA</b><small>Stay For Sunrise</small></div>
+  <div class="loading" id="loading">Casting the dial…</div>
+  <div class="hint">Drag to orbit · scroll to zoom</div>
+  <canvas id="c"></canvas>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+  import * as THREE from 'three';
+  import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+  const GLB='https://d3u0tzju9qaucj.cloudfront.net/7d051b5a-7bfe-49fe-a484-24e7b3a9458a/adfb2cdd-a4ae-42be-afe0-042d36b07547.glb';
+  const canvas=document.getElementById('c');
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setClearColor(0x000000,0);renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.outputColorSpace=THREE.SRGBColorSpace;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
+
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(40,1,0.1,100);
+  camera.position.set(2.6,2.2,3.2);
+
+  scene.add(new THREE.HemisphereLight(0xfff3da,0xb08f5a,1.0));
+  const key=new THREE.DirectionalLight(0xfff0d0,1.6);key.position.set(4,6,3);scene.add(key);
+  const fill=new THREE.DirectionalLight(0xffd9a0,0.5);fill.position.set(-4,2,-2);scene.add(fill);
+
+  const controls=new OrbitControls(camera,canvas);
+  controls.enableDamping=true;controls.dampingFactor=0.08;
+  controls.autoRotate=true;controls.autoRotateSpeed=1.1;
+  controls.minDistance=1.6;controls.maxDistance=8;controls.target.set(0,0,0);
+
+  function size(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+  size();addEventListener('resize',size);
+
+  new GLTFLoader().load(GLB, gltf=>{
+    const obj=gltf.scene;
+    const box=new THREE.Box3().setFromObject(obj);
+    const c=box.getCenter(new THREE.Vector3()), s=box.getSize(new THREE.Vector3());
+    const scale=2.4/Math.max(s.x,s.y,s.z);
+    obj.position.sub(c);obj.scale.setScalar(scale);
+    const g=new THREE.Group();g.add(obj);scene.add(g);
+    document.getElementById('loading').classList.add('hide');
+  }, undefined, err=>{
+    document.getElementById('loading').textContent='Could not load 3D model';
+    console.error(err);
+  });
+
+  (function loop(){requestAnimationFrame(loop);controls.update();renderer.render(scene,camera);})();
+</script>
+</body>
+</html>
