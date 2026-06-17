@@ -199,7 +199,8 @@
   bCube.addEventListener('click',()=>setShape('cube'));
   bBolt.addEventListener('click',()=>setShape('bolt'));
 
-  function size(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+  let frameMul=1;
+  function size(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;frameMul=camera.aspect<1?Math.min(1/camera.aspect,2.3):1;camera.updateProjectionMatrix();}
   size(); addEventListener('resize',size);
 
   const clock=new THREE.Clock();
@@ -220,7 +221,7 @@
     // zoom in only on click (toggle); hover just animates the skin
     const wantZoom=clickLock?1:0;
     zoom+=(wantZoom-zoom)*0.07;
-    camera.position.z=R_START+(R_ZOOM-R_START)*zoom;
+    camera.position.z=(R_START+(R_ZOOM-R_START)*zoom)*frameMul;
     renderer.render(scene,camera);
   })();
 
