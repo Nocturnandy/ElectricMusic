@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lightning // Checkmate</title>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+<style>
+  :root{
+    --glb:"https://d3u0tzju9qaucj.cloudfront.net/7d051b5a-7bfe-49fe-a484-24e7b3a9458a/d0ff59cd-4f33-4030-994b-6b8df451f17c.glb";
+    --img:"https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260617_031805_3d4d7e3c-984e-4cd0-9efc-1125979dd4fd.png";
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;background:#07080c;overflow:hidden;font-family:"Helvetica Neue",Arial,sans-serif;color:#e9eefc}
+
+  /* ---------- GRUNGY BLURRED BACKGROUND ---------- */
+  .bg{position:fixed;inset:-8%;z-index:0;
+    background:url("https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260617_031805_3d4d7e3c-984e-4cd0-9efc-1125979dd4fd.png") center/cover no-repeat;
+    filter:blur(38px) brightness(.42) saturate(1.3) contrast(1.1);
+    transform:scale(1.15)}
+  .bg-grunge{position:fixed;inset:0;z-index:1;pointer-events:none;mix-blend-mode:overlay;opacity:.55;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .bg-glow{position:fixed;inset:0;z-index:1;pointer-events:none;
+    background:radial-gradient(60% 55% at 50% 42%,rgba(90,150,255,.28),transparent 70%),
+               radial-gradient(40% 40% at 70% 80%,rgba(180,90,255,.18),transparent 70%)}
+  .vignette{position:fixed;inset:0;z-index:2;pointer-events:none;
+    box-shadow:inset 0 0 220px 60px rgba(0,0,0,.85)}
+
+  /* ---------- STAGE ---------- */
+  .stage{position:fixed;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center}
+
+  /* perspective chessboard floor */
+  .board-wrap{position:absolute;bottom:6vh;left:50%;transform:translateX(-50%);
+    perspective:900px;z-index:3;pointer-events:none}
+  .board{width:min(78vw,640px);aspect-ratio:1;display:grid;grid-template-columns:repeat(8,1fr);
+    transform:rotateX(64deg);transform-origin:center;position:relative;
+    border:1px solid rgba(200,225,255,.55);border-radius:6px;
+    background:rgba(30,45,80,.18);backdrop-filter:blur(6px) saturate(1.3);-webkit-backdrop-filter:blur(6px) saturate(1.3);
+    overflow:hidden;
+    /* thick extruded glass slab edge (light top -> deep blue bottom) + heavy contact shadow */
+    box-shadow:
+      inset 0 0 60px rgba(150,190,255,.18),
+      0 2px 0 rgba(190,222,255,.55),
+      0 4px 0 rgba(150,188,240,.5),
+      0 6px 0 rgba(120,160,222,.5),
+      0 9px 0 rgba(92,132,198,.5),
+      0 12px 0 rgba(70,108,176,.5),
+      0 16px 0 rgba(50,84,150,.52),
+      0 20px 0 rgba(36,64,124,.54),
+      0 25px 0 rgba(26,50,104,.56),
+      0 30px 0 rgba(18,38,84,.58),
+      0 36px 0 rgba(12,28,66,.6),
+      0 42px 0 rgba(8,20,50,.62),
+      0 48px 0 rgba(5,14,38,.64),
+      0 70px 60px rgba(0,0,0,.85),
+      0 120px 90px rgba(0,0,0,.6)}
+  .board i{display:block;position:relative;box-shadow:inset 0 0 0 .5px rgba(255,255,255,.10)}
+  /* glass squares */
+  .board i.l{background:linear-gradient(135deg,rgba(225,238,255,.42),rgba(150,185,235,.14))}
+  .board i.d{background:linear-gradient(135deg,rgba(50,75,130,.34),rgba(8,16,40,.30))}
+  .board i::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(160deg,rgba(255,255,255,.30),transparent 45%);opacity:.7}
+  /* glossy glass sheen sweeping across the whole board */
+  .board::before{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+    background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.22) 48%,transparent 60%)}
+  .board-glow{position:absolute;bottom:5vh;left:50%;transform:translateX(-50%);width:min(60vw,460px);height:120px;
+    background:radial-gradient(ellipse,rgba(90,160,255,.5),transparent 70%);filter:blur(20px);z-index:2}
+
+  model-viewer{position:relative;z-index:4;width:min(86vw,560px);height:min(72vh,620px);
+    --poster-color:transparent;background:transparent;
+    filter:drop-shadow(0 0 30px rgba(120,170,255,.55))}
+
+  /* ---------- TYPE ---------- */
+  .titles{position:fixed;z-index:5;top:6vh;width:100%;text-align:center;pointer-events:none;mix-blend-mode:screen}
+  .titles h1{font-size:clamp(38px,11vw,140px);font-weight:800;letter-spacing:.18em;line-height:.9;
+    background:linear-gradient(180deg,#eaf1ff,#7ea4ff 60%,#3b63d4);-webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 40px rgba(110,160,255,.4)}
+  .titles p{margin-top:14px;font-size:clamp(11px,1.5vw,16px);letter-spacing:.55em;color:#8fa6d8;text-transform:uppercase}
+  .hint{position:fixed;bottom:3vh;left:0;right:0;z-index:6;text-align:center;font-size:12px;letter-spacing:.35em;
+    text-transform:uppercase;color:#9fb2dd;opacity:.0;animation:fadein 1s 1.2s forwards}
+  @keyframes fadein{to{opacity:.8}}
+
+  /* ---------- GLASS SHATTER OVERLAY ---------- */
+  #shatter{position:fixed;inset:0;z-index:30;cursor:pointer}
+  #shatter .frost{position:absolute;inset:0;
+    background:rgba(180,205,255,.07);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2)}
+  #shatter .label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;text-shadow:0 2px 30px rgba(0,0,0,.6)}
+  #shatter .label .big{font-size:clamp(28px,7vw,80px);font-weight:800;letter-spacing:.12em;color:#eaf1ff}
+  #shatter .label .sub{margin-top:18px;font-size:13px;letter-spacing:.5em;color:#bcd0ff;text-transform:uppercase;
+    animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:.45}50%{opacity:1}}
+  .crack{position:absolute;inset:0;pointer-events:none}
+  .shard{position:absolute;inset:0;background:rgba(190,212,255,.10);
+    backdrop-filter:blur(13px) saturate(1.2);-webkit-backdrop-filter:blur(13px) saturate(1.2);
+    border:.5px solid rgba(220,235,255,.18);
+    transition:transform 1.05s cubic-bezier(.2,.7,.25,1),opacity 1.05s ease;will-change:transform,opacity}
+  #shatter.go{pointer-events:none}
+  #shatter.go .frost,#shatter.go .label,#shatter.go .crack{opacity:0;transition:opacity .35s}
+  #shatter.go .shard{opacity:0}
+</style>
+</head>
+<body>
+  <div class="bg"></div>
+  <div class="bg-glow"></div>
+  <div class="bg-grunge"></div>
+  <div class="vignette"></div>
+
+  <div class="stage">
+    <div class="board-glow"></div>
+    <div class="board-wrap"><div class="board" id="board"></div></div>
+    <model-viewer id="mv"
+      src="https://d3u0tzju9qaucj.cloudfront.net/7d051b5a-7bfe-49fe-a484-24e7b3a9458a/6747c819-76cc-44da-bd9b-90907d709f32.glb"
+      crossorigin="anonymous"
+      alt="Lightning bolt chess piece"
+      camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="16deg"
+      shadow-intensity="0.55" shadow-softness="1" exposure="1.15"
+      tone-mapping="aces" environment-image="https://modelviewer.dev/shared-assets/environments/spruit_sunrise_1k.hdr"
+      camera-orbit="0deg 76deg 110%" interaction-prompt="none">
+    </model-viewer>
+  </div>
+
+  <!-- glass shatter overlay -->
+  <div id="shatter">
+    <div class="frost"></div>
+    <svg class="crack" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <g stroke="rgba(225,238,255,.5)" stroke-width=".18" fill="none">
+        <path d="M50 50 L20 5 M50 50 L62 0 M50 50 L98 22 M50 50 L100 60 M50 50 L74 100 M50 50 L40 100 M50 50 L2 78 M50 50 L0 38"/>
+        <path d="M30 27 L70 18 L88 52 L66 84 L33 80 L16 48 Z" opacity=".55"/>
+        <path d="M42 41 L60 38 L66 54 L54 66 L40 60 Z" opacity=".7"/>
+      </g>
+    </svg>
+  </div>
+
+<script>
+  // ---------- apply beautiful transparent GLASS material to the piece ----------
+  const mv=document.getElementById('mv');
+  mv.addEventListener('load',()=>{
+    try{
+      const mats=mv.model.materials;
+      mats.forEach(m=>{
+        // clear any baked color texture so glass shows through
+        if(m.pbrMetallicRoughness.baseColorTexture && m.pbrMetallicRoughness.baseColorTexture.setTexture)
+          m.pbrMetallicRoughness.baseColorTexture.setTexture(null);
+        m.pbrMetallicRoughness.setBaseColorFactor([0.74,0.85,1.0,0.30]); // cool crystal tint
+        m.pbrMetallicRoughness.setMetallicFactor(0.0);
+        m.pbrMetallicRoughness.setRoughnessFactor(0.0);   // mirror-smooth glass
+        if(m.setAlphaMode) m.setAlphaMode('BLEND');
+        if(m.setEmissiveFactor) m.setEmissiveFactor([0.03,0.07,0.16]); // faint inner glow
+        // KHR_materials_transmission / volume — real refraction where supported
+        if(m.setTransmissionFactor) m.setTransmissionFactor(1.0);
+        if(m.setThicknessFactor) m.setThicknessFactor(2.0);
+        if(m.setAttenuationColor) m.setAttenuationColor([0.55,0.75,1.0]);
+        if(m.setIor) m.setIor(1.52);
+      });
+    }catch(e){console.warn('glass material override skipped',e);}
+  });
+  mv.addEventListener('error',(ev)=>{
+    console.error('model-viewer failed to load the .glb',ev.detail);
+    const n=document.createElement('div');
+    n.style.cssText='position:fixed;z-index:50;left:50%;top:50%;transform:translate(-50%,-50%);color:#cdddff;font:13px/1.6 Arial;letter-spacing:.1em;text-align:center;opacity:.85';
+    n.textContent='3D model could not load (blocked). Use the local assets/piece.glb instead.';
+    document.body.appendChild(n);
+  });
+
+  // build chessboard
+  const b=document.getElementById('board');
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){const i=document.createElement('i');i.className=((r+c)%2)?'d':'l';b.appendChild(i);}
+
+  // build glass shards from a center point
+  const sh=document.getElementById('shatter');
+  const N=26, cx=50, cy=48;
+  const pts=[];
+  for(let k=0;k<N;k++){const a=(k/N)*Math.PI*2;const rad=14+Math.random()*60;
+    pts.push([cx+Math.cos(a)*rad, cy+Math.sin(a)*rad]);}
+  for(let k=0;k<N;k++){
+    const p1=pts[k], p2=pts[(k+1)%N];
+    const d=document.createElement('div');d.className='shard';
+    d.style.clipPath=`polygon(${cx}% ${cy}%, ${p1[0]}% ${p1[1]}%, ${p2[0]}% ${p2[1]}%)`;
+    sh.appendChild(d);
+  }
+  const shards=[...sh.querySelectorAll('.shard')];
+  sh.addEventListener('click',()=>{
+    if(sh.classList.contains('go'))return;
+    shards.forEach((s,i)=>{
+      const ang=(i/shards.length)*Math.PI*2;
+      const dist=240+Math.random()*420;
+      const tx=Math.cos(ang)*dist, ty=Math.sin(ang)*dist;
+      const rot=(Math.random()-.5)*220, sc=.4+Math.random()*.7;
+      s.style.transitionDelay=(Math.random()*.12)+'s';
+      s.style.transform=`translate(${tx}px,${ty}px) rotate(${rot}deg) scale(${sc})`;
+    });
+    sh.classList.add('go');
+    setTimeout(()=>sh.remove(),1400);
+  });
+</script>
+</body>
+</html>
