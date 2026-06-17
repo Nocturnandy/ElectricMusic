@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SUNDARA — Photoreal Poster</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#1a1620;display:flex;justify-content:center;align-items:flex-start;
+    min-height:100vh;font-family:'Space Mono',monospace;color:#3a3a40;padding:24px 0;}
+
+  /* poster frame — 9:16, photoreal sphere as the bg */
+  .poster{position:relative;width:min(94vw,500px);aspect-ratio:9/16;overflow:hidden;
+    background:#e9d8ec center/cover no-repeat;
+    /* swap this URL for the other render: 357bd365-...  */
+    background-image:url("https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260617_025331_96890652-4b7f-4e45-9f76-7c5b7e6b9b85.png");
+    box-shadow:0 30px 80px rgba(0,0,0,.5);}
+
+  .row{position:absolute;left:0;right:0;display:flex;justify-content:space-between;align-items:center;
+    padding:0 22px;font-size:10px;letter-spacing:3px;text-transform:uppercase;}
+  .row .mark{display:flex;align-items:center;gap:8px;}
+  .sq{width:7px;height:7px;background:#3a3a40;display:inline-block;}
+  .top{top:62.5%;}
+  .bolts{display:flex;gap:3px;}
+  .bolts svg{width:11px;height:15px;display:block;}
+
+  .wordmark{position:absolute;left:0;right:0;top:66%;text-align:center;}
+  .wordmark .logo{width:84%;aspect-ratio:5.347;margin:0 auto;background:#5a5560;
+    -webkit-mask:url("Web Assets/sundara_wordmark.png") center/contain no-repeat;
+    mask:url("Web Assets/sundara_wordmark.png") center/contain no-repeat;}
+
+  .bill{position:absolute;left:0;right:0;top:80%;text-align:center;}
+  .bill .date{font-weight:700;font-size:15px;letter-spacing:3px;margin-bottom:8px;}
+  .bill .acts{display:flex;flex-direction:column;gap:3px;font-size:13px;letter-spacing:2px;text-transform:uppercase;}
+  .bill .acts span:first-child{font-weight:700;}
+
+  .foot{bottom:3.2%;}
+</style>
+</head>
+<body>
+  <div class="poster">
+
+    <div class="row top">
+      <div class="mark"><span class="sq"></span>ELECTRIC</div>
+      <div class="bolts">
+        <svg viewBox="0 0 24 34"><path d="M14 1 4 19h6l-3 14L21 12h-6l3-11z" fill="currentColor"/></svg>
+        <svg viewBox="0 0 24 34"><path d="M14 1 4 19h6l-3 14L21 12h-6l3-11z" fill="currentColor"/></svg>
+        <svg viewBox="0 0 24 34"><path d="M14 1 4 19h6l-3 14L21 12h-6l3-11z" fill="currentColor"/></svg>
+      </div>
+      <div class="mark">EVERY SUNDAY<span class="sq"></span></div>
+    </div>
+
+    <div class="wordmark"><div class="logo" role="img" aria-label="SUNDARA"></div></div>
+
+    <div class="bill">
+      <div class="date">SUN 21 JUNE</div>
+      <div class="acts">
+        <span>ROMZA</span>
+        <span>NALIITA</span>
+        <span>NILS TWATCHMANN</span>
+        <span>RITMIK</span>
+      </div>
+    </div>
+
+    <div class="row foot">
+      <div class="mark"><span class="sq"></span>8PM – 3AM</div>
+      <div class="mark">265 CHAPEL ST PRAHRAN<span class="sq"></span></div>
+    </div>
+
+  </div>
+</body>
+</html>

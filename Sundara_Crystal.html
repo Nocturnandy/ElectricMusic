@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SUNDARA — Crystal</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+  :root{ --ink:#e7e3ea; --ink-soft:#7d7a86; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;}
+  body{font-family:'Space Mono',monospace;color:var(--ink);background:#050506;
+    min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+  body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(ellipse 70% 60% at 50% 42%, #141118 0%, #050506 70%);}
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:6;mix-blend-mode:overlay;opacity:.06;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+  .wrap{position:relative;z-index:2;max-width:920px;margin:0 auto;padding:0 26px;display:flex;flex-direction:column;min-height:100vh;}
+  .hero{flex:1;display:flex;align-items:center;justify-content:center;padding:30px 0 8px;}
+  #stage{width:min(72vw,540px);height:min(80vh,600px);cursor:grab;touch-action:none;
+    image-rendering:pixelated;image-rendering:crisp-edges;}
+  #stage:active{cursor:grabbing;}
+
+  .wordmark{text-align:center;margin:2px 0 2px;}
+  .wordmark .logo{width:min(80vw,620px);aspect-ratio:5.347;margin:0 auto;background:#e7e3ea;
+    -webkit-mask:url("Web Assets/sundara_wordmark.png") center/contain no-repeat;
+    mask:url("Web Assets/sundara_wordmark.png") center/contain no-repeat;}
+  .tags{display:flex;justify-content:center;gap:14px;margin:16px 0 22px;
+    font-size:11px;letter-spacing:5px;text-transform:uppercase;color:var(--ink-soft);}
+  .tags b{color:var(--ink);font-weight:700;}
+
+  .switch{display:flex;justify-content:center;gap:10px;margin:0 0 34px;}
+  .switch button{background:transparent;border:1px solid #2a2730;color:var(--ink-soft);
+    font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;
+    padding:8px 14px;cursor:pointer;transition:.2s;}
+  .switch button:hover{border-color:#4a4654;color:var(--ink);}
+  .switch button.on{border-color:var(--ink);color:var(--ink);}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero"><canvas id="stage"></canvas></div>
+    <div class="wordmark"><div class="logo" role="img" aria-label="SUNDARA"></div></div>
+    <div class="tags"><b>HOLD THE GROOVE</b></div>
+    <div class="switch">
+      <button data-shape="sphere" class="on">Sphere</button>
+      <button data-shape="gem">Gem</button>
+      <button data-shape="bolt">Bolt</button>
+    </div>
+  </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  if(!window.THREE) return;
+  const canvas=document.getElementById('stage');
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setClearColor(0x000000,0);
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(38,1,0.1,100);
+  camera.position.set(0,0,6);
+
+  const uniforms={
+    uLightDir:{value:new THREE.Vector3(-0.4,0.7,0.6).normalize()},
+    uMouse:{value:new THREE.Vector2(0,0)},
+    uHover:{value:0},
+    uFaceted:{value:0}     // 1 = flat crystal facets, 0 = smooth glass
+  };
+  const vert=`
+    uniform vec2 uMouse; uniform float uHover;
+    varying vec3 vViewPos; varying vec3 vONormal; varying float vFace;
+    void main(){
+      vec3 vn=normalize(normalMatrix*normal);
+      vec3 mDir=normalize(vec3(uMouse*1.3,0.85));
+      float face=max(dot(vn,mDir),0.0); vFace=face;
+      vec3 disp=position+normal*uHover*pow(face,2.0)*0.5;
+      vec4 mv=modelViewMatrix*vec4(disp,1.0);
+      vViewPos=mv.xyz; vONormal=vn;
+      gl_Position=projectionMatrix*mv;
+    }`;
+  const frag=`
+    #extension GL_OES_standard_derivatives : enable
+    precision highp float;
+    uniform vec3 uLightDir; uniform vec2 uMouse; uniform float uHover; uniform float uFaceted;
+    varying vec3 vViewPos; varying vec3 vONormal; varying float vFace;
+    vec3 hsv2rgb(vec3 c){vec4 K=vec4(1.,2./3.,1./3.,3.);vec3 p=abs(fract(c.xxx+K.xyz)*6.-K.www);return c.z*mix(K.xxx,clamp(p-K.xxx,0.,1.),c.y);}
+    void main(){
+      vec3 flatN=normalize(cross(dFdx(vViewPos),dFdy(vViewPos)));
+      vec3 N=mix(normalize(vONormal),flatN,uFaceted);
+      vec3 V=normalize(-vViewPos);
+      vec3 L=normalize(uLightDir);
+      float ndv=max(dot(N,V),0.0);
+      float f=1.0-ndv;                                  // 0 centre -> 1 rim
+      vec3 R=refract(-V,N,0.62);
+      float ang=atan(R.y,R.x);
+      // concentric spectral rings (dispersion) + angular sweep
+      float bands=f*2.3 + ang/6.2831853*0.6 + R.z*0.15;
+      float hue=fract(bands + 0.55 + uHover*(uMouse.x*0.25+vFace*0.35));
+      vec3 spectrum=hsv2rgb(vec3(hue,1.0,1.0));
+      // vivid rainbow body, fading in just off the hotspot
+      vec3 col=spectrum*smoothstep(0.04,0.42,f)*1.35;
+      // tight glossy white hotspot where it faces the eye
+      float hot=pow(ndv,6.0);
+      col+=vec3(1.0)*hot*0.95;
+      // sharp facet/edge glints
+      float spec=pow(max(dot(reflect(-L,N),V),0.0),80.0);
+      col+=vec3(1.0)*spec;
+      // deep glassy falloff at the extreme rim -> reads on black
+      col*=1.0 - smoothstep(0.9,1.0,f)*0.55;
+      // bloom of colour out of the spot under the cursor
+      col+=spectrum*uHover*pow(vFace,3.0)*0.8;
+      gl_FragColor=vec4(col,1.0);
+    }`;
+  const mat=new THREE.ShaderMaterial({uniforms,vertexShader:vert,fragmentShader:frag,extensions:{derivatives:true}});
+
+  // ── geometries ──
+  function boltGeo(){
+    const pts=[[14,1],[4,19],[10,19],[7,33],[21,12],[15,12],[18,1]];
+    const cx=12.5,cy=17,sc=1/9.5; const s=new THREE.Shape();
+    pts.forEach((p,i)=>{const x=(p[0]-cx)*sc,y=-(p[1]-cy)*sc;i?s.lineTo(x,y):s.moveTo(x,y);});
+    s.closePath();
+    const g=new THREE.ExtrudeGeometry(s,{depth:0.55,bevelEnabled:true,bevelThickness:0.14,bevelSize:0.12,bevelSegments:3,steps:1});
+    g.center(); return g;
+  }
+  const GEOS={
+    sphere:{geo:new THREE.SphereGeometry(1.7,128,128),faceted:0,scale:1},
+    gem:{geo:new THREE.IcosahedronGeometry(1.8,1),faceted:1,scale:1},
+    bolt:{geo:boltGeo(),faceted:1,scale:1.6}
+  };
+  let mesh=new THREE.Mesh(GEOS.sphere.geo,mat); scene.add(mesh);
+  let facetT=0;
+  function setShape(name){
+    const d=GEOS[name]; scene.remove(mesh);
+    mesh=new THREE.Mesh(d.geo,mat); mesh.scale.setScalar(d.scale); scene.add(mesh);
+    facetT=d.faceted;
+    document.querySelectorAll('.switch button').forEach(b=>b.classList.toggle('on',b.dataset.shape===name));
+  }
+  document.querySelectorAll('.switch button').forEach(b=>b.addEventListener('click',()=>setShape(b.dataset.shape)));
+
+  // ── interaction ──
+  let dragging=false,px=0,py=0,velX=0,velY=0,rotX=0,rotY=0,hoverT=0;
+  const mouse=new THREE.Vector2(0,0);
+  function setMouse(e){const r=canvas.getBoundingClientRect();mouse.x=((e.clientX-r.left)/r.width)*2-1;mouse.y=-(((e.clientY-r.top)/r.height)*2-1);}
+  canvas.addEventListener('pointerenter',()=>hoverT=1);
+  canvas.addEventListener('pointerleave',()=>{hoverT=0;dragging=false;});
+  canvas.addEventListener('pointerdown',e=>{dragging=true;px=e.clientX;py=e.clientY;canvas.setPointerCapture(e.pointerId);});
+  canvas.addEventListener('pointerup',()=>dragging=false);
+  canvas.addEventListener('pointermove',e=>{setMouse(e);hoverT=1;if(dragging){velY=(e.clientX-px)*0.007;velX=(e.clientY-py)*0.007;rotY+=velY;rotX+=velX;px=e.clientX;py=e.clientY;}});
+
+  let baseW=1,baseH=1,basePR=Math.min(devicePixelRatio,2),curPix=1;
+  function applyRes(){renderer.setPixelRatio(basePR*curPix);renderer.setSize(baseW,baseH,false);}
+  function size(){const r=canvas.getBoundingClientRect();baseW=Math.max(1,r.width);baseH=Math.max(1,r.height);camera.aspect=baseW/baseH;camera.updateProjectionMatrix();applyRes();}
+  size();addEventListener('resize',size);
+
+  (function loop(){
+    requestAnimationFrame(loop);
+    uniforms.uHover.value+=(hoverT-uniforms.uHover.value)*0.12;
+    uniforms.uFaceted.value+=(facetT-uniforms.uFaceted.value)*0.15;
+    uniforms.uMouse.value.x+=(mouse.x-uniforms.uMouse.value.x)*0.18;
+    uniforms.uMouse.value.y+=(mouse.y-uniforms.uMouse.value.y)*0.18;
+    const tp=hoverT?0.08:1.0, np=curPix+(tp-curPix)*0.18;
+    if(Math.abs(np-curPix)>0.001){curPix=np;applyRes();}
+    if(!dragging){rotY+=0.004;velX*=0.94;velY*=0.94;rotY+=velY;rotX+=velX;}
+    rotX=Math.max(-1.0,Math.min(1.0,rotX));
+    mesh.rotation.y=rotY;mesh.rotation.x=rotX;
+    renderer.render(scene,camera);
+  })();
+})();
+</script>
+</body>
+</html>
