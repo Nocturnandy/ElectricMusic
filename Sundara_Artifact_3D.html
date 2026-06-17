@@ -208,6 +208,9 @@
 
   function size(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;portrait=camera.aspect<1;frameMul=portrait?Math.min(1/camera.aspect,1.7):1;camera.updateProjectionMatrix();}
   size(); addEventListener('resize',size);
+  /* iframe-safe: re-frame whenever the embed actually gets its size */
+  if(window.ResizeObserver){ new ResizeObserver(()=>size()).observe(document.documentElement); }
+  requestAnimationFrame(size); setTimeout(size,150); setTimeout(size,500); addEventListener('load',size);
 
   const clock=new THREE.Clock();
   (function loop(){
