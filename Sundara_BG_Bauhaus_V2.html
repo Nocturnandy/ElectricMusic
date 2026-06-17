@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SUNDARA — Bauhaus Sun Background V2 (moving + icons)</title>
+<!-- Animated geometric grid that mixes in the six Higgsfield bauhaus icons. Standalone background option. -->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=Anton&display=swap');
+  :root{--cream:#EEE5CF;--ink:#16130F;--navy:#275A81;--orange:#FC7218;--sand:#E4D2A6;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--cream);color:var(--ink);font-family:'Space Mono',monospace;overflow:hidden;}
+  body::after{content:'';position:fixed;inset:0;z-index:999;pointer-events:none;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+  .hero{position:relative;min-height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+  /* the grid is oversized and slowly drifts for a 'moving wallpaper' feel */
+  .pattern{position:absolute;top:-10%;left:-10%;width:120%;height:120%;z-index:1;display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(118px,1fr));grid-auto-rows:118px;
+    animation:drift 60s ease-in-out infinite alternate;}
+  @keyframes drift{from{transform:translate(0,0) scale(1.02);}to{transform:translate(-3%,-2%) scale(1.06);}}
+  .tile{position:relative;overflow:hidden;}
+  .tile svg{width:100%;height:100%;display:block;}
+  .tile img{width:100%;height:100%;object-fit:cover;display:block;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.14);}}
+  @keyframes rays{to{transform:rotate(-360deg);}}
+  @keyframes bob{0%,100%{transform:scale(1) rotate(0);}50%{transform:scale(1.07) rotate(3deg);}}
+  @keyframes turn{to{transform:rotate(360deg);}}
+  .tile .rot{transform-origin:50% 50%;animation:spin 26s linear infinite;}
+  .tile .pul{transform-origin:50% 50%;animation:pulse 6s ease-in-out infinite;}
+  .tile .ray{transform-origin:50% 50%;animation:rays 40s linear infinite;}
+  .tile.ico-bob img{animation:bob 7s ease-in-out infinite;}
+  .tile.ico-turn img{animation:turn 30s linear infinite;}
+
+  .hero-scrim{position:absolute;inset:0;z-index:2;pointer-events:none;
+    background:radial-gradient(ellipse 64% 56% at 50% 50%,rgba(238,229,207,.88) 0%,rgba(238,229,207,.5) 45%,rgba(238,229,207,.12) 100%);}
+  .hero-ui{position:relative;z-index:3;text-align:center;padding:0 24px;}
+  .hero-ui h1{font-family:'Anton',sans-serif;font-size:clamp(56px,12vw,150px);color:var(--orange);letter-spacing:2px;line-height:.9;}
+  .hero-ui .tag{margin-top:14px;font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,3vw,34px);letter-spacing:.22em;color:var(--navy);text-transform:uppercase;}
+  .hero-ui .sub{margin-top:12px;font-size:11px;letter-spacing:5px;text-transform:uppercase;opacity:.6;}
+</style>
+</head>
+<body>
+  <header class="hero">
+    <div class="pattern" id="pattern"></div>
+    <div class="hero-scrim"></div>
+    <div class="hero-ui">
+      <h1>SUNDARA</h1>
+      <p class="tag">Stay For Sunrise</p>
+      <p class="sub">Naarm / Melbourne · Est. 2024</p>
+    </div>
+  </header>
+
+<script>
+  const NAVY='#275A81', ORANGE='#FC7218', CREAM='#EEE5CF', CREAMD='#E6D9BC', SAND='#E4D2A6';
+  const shapes = [
+    c => `<svg viewBox="0 0 100 100"><g class="rot"><path d="M0 100 A100 100 0 0 1 100 0 L100 100 Z" fill="${c.a}"/></g></svg>`,
+    c => `<svg viewBox="0 0 100 100"><circle class="pul" cx="50" cy="50" r="34" fill="${c.a}"/></svg>`,
+    c => `<svg viewBox="0 0 100 100"><path d="M0 50 A50 50 0 0 1 100 50 Z" fill="${c.a}"/></svg>`,
+    c => `<svg viewBox="0 0 100 100"><path d="M0 0 A100 100 0 0 1 100 100 L0 100 Z" fill="${c.a}"/><circle cx="50" cy="50" r="16" fill="${c.b}"/></svg>`,
+    c => {let r='';for(let i=0;i<12;i++){const a=i*30*Math.PI/180;r+=`<line x1="50" y1="50" x2="${50+46*Math.cos(a)}" y2="${50+46*Math.sin(a)}" stroke="${c.a}" stroke-width="5"/>`;}return `<svg viewBox="0 0 100 100"><g class="ray">${r}</g><circle cx="50" cy="50" r="12" fill="${c.b}"/></svg>`;},
+    c => `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="${c.a}" stroke-width="6"/><circle class="pul" cx="50" cy="50" r="20" fill="${c.b}"/></svg>`,
+  ];
+  const palettes = [
+    {bg:CREAM, a:NAVY, b:ORANGE},{bg:CREAM, a:ORANGE, b:NAVY},
+    {bg:NAVY, a:ORANGE, b:CREAM},{bg:ORANGE, a:NAVY, b:CREAM},{bg:SAND, a:NAVY, b:ORANGE},
+  ];
+  /* the six Higgsfield bauhaus icons */
+  const ICONS=[
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260617_004134_fc344e03-e851-4d21-b7fa-cba4b8bd1be9.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260617_004136_0a01ce48-483f-4e38-8042-755b7e139d83.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260617_004138_2a7f0e3c-cf0c-473b-9fe8-782456113d4a.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260617_004202_0bf7af09-fa8c-4116-bac3-6ddcbbc0e9a9.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260617_004204_0bf1adfc-62ae-4833-aa69-40d97fcf247a.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260617_004205_80b47f79-4c15-4b70-8c54-4a6d3e5487cf.png',
+  ];
+  (function build(){
+    const wrap=document.getElementById('pattern');
+    const cols=Math.ceil(window.innerWidth*1.2/118);
+    const rows=Math.ceil(window.innerHeight*1.2/118);
+    const n=cols*rows+cols;
+    let html='';
+    for(let i=0;i<n;i++){
+      if(Math.random()<0.20){                       /* an icon tile */
+        const url=ICONS[Math.floor(Math.random()*ICONS.length)];
+        const anim=Math.random()<0.5?'ico-bob':'ico-turn';
+        html+=`<div class="tile ${anim}"><img src="${url}" alt="" onerror="this.parentNode.style.background='${ORANGE}';this.remove();"></div>`;
+      } else {                                       /* a geometric tile */
+        const p=palettes[Math.floor(Math.random()*palettes.length)];
+        const s=shapes[Math.floor(Math.random()*shapes.length)];
+        const rot=[0,90,180,270][Math.floor(Math.random()*4)];
+        html+=`<div class="tile" style="background:${p.bg};transform:rotate(${rot}deg)">${s(p)}</div>`;
+      }
+    }
+    wrap.innerHTML=html;
+  })();
+</script>
+</body>
+</html>
