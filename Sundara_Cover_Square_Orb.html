@@ -23,9 +23,9 @@
 
   /* oil-slick orb — centred, large, no wordmark */
   .orb{position:absolute;z-index:2;left:50%;top:50%;transform:translate(-50%,-50%);
-    width:80%;aspect-ratio:1;
-    background:center/contain no-repeat
-      url("https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260617_052553_ba8e7781-c56f-49cf-8b06-3efaddf0d2a8.png");
+    width:62%;aspect-ratio:1;
+    /* crop the 768x1376 transparent PNG to just the 593px orb region */
+    background:url("https://d8j0ntlcm91z4.cloudfront.net/user_3EySPqfEw7pWyOKGf0HDCVHDWHg/hf_20260617_052553_ba8e7781-c56f-49cf-8b06-3efaddf0d2a8.png") 50% 36.8% / 116.4% 208.5% no-repeat;
     filter:drop-shadow(0 26px 60px rgba(40,10,55,.36));}
 
   /* minimal catalogue marks only */

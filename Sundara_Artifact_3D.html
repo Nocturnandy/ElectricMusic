@@ -206,7 +206,7 @@
   bCube.addEventListener('click',()=>setShape('cube'));
   bBolt.addEventListener('click',()=>setShape('bolt'));
 
-  function size(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;portrait=camera.aspect<1;frameMul=portrait?Math.min(1/camera.aspect,1.7):1;camera.updateProjectionMatrix();}
+  function size(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,true);camera.aspect=w/h;portrait=camera.aspect<1;frameMul=portrait?Math.min(1/camera.aspect,1.2):1;camera.updateProjectionMatrix();}
   size(); addEventListener('resize',size);
   /* iframe-safe: re-frame whenever the embed actually gets its size */
   if(window.ResizeObserver){ new ResizeObserver(()=>size()).observe(document.documentElement); }
@@ -217,7 +217,7 @@
     requestAnimationFrame(loop);
     uniforms.uTime.value=clock.getElapsedTime();
     orb.position.y=0.28+Math.sin(uniforms.uTime.value*0.9)*0.085;   // gentle float up/down
-    orb.scale.setScalar(baseScale*(portrait?0.58:1));               // much smaller on phone
+    orb.scale.setScalar(baseScale*(portrait?0.8:1));                // a touch smaller on phone
     uniforms.uHover.value+=(hoverT-uniforms.uHover.value)*0.08;
     uniforms.uMouse.value.x+=(mouse.x-uniforms.uMouse.value.x)*0.1;
     uniforms.uMouse.value.y+=(mouse.y-uniforms.uMouse.value.y)*0.1;
